@@ -1,0 +1,36 @@
+.profil-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: system-ui, sans-serif;
+    color: #1f2937;
+  }
+  
+  .profil-container h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .profil-container p {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .error-message {
+    color: #dc2626;
+    text-align: center;
+    font-size: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .loading-message {
+    text-align: center;
+    font-size: 1rem;
+    margin: 2rem 0;
+  }
+  
