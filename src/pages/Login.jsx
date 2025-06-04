@@ -1,18 +1,16 @@
-import './Login.css';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import '../styles/Login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch('http://localhost:3002/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -21,11 +19,11 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
+        setMessage('Connexion réussie !');
         localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.user.id);
-        navigate('/profil');
+        window.location.href = '/';
       } else {
-        setMessage(data.error || 'Échec de la connexion');
+        setMessage(data.message || 'Erreur lors de la connexion.');
       }
     } catch (err) {
       console.error(err);
@@ -34,30 +32,28 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2>Connexion</h2>
+    <form onSubmit={handleSubmit} className="login-form">
+      <h2>Connexion</h2>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
 
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
 
-        <button type="submit">Se connecter</button>
+      <button type="submit">Se connecter</button>
 
-        {message && <p className="error-message">{message}</p>}
-      </form>
-    </div>
+      {message && <p className="message">{message}</p>}
+    </form>
   );
 }

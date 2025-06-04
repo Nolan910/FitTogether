@@ -1,4 +1,4 @@
-import './Profil.css';
+import '../styles/Profil.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ export default function Profil() {
     //   return navigate('/login');
     // }
 
-    fetch(`http://localhost:5000/user/${userId}`, {
+    fetch(`http://localhost:3002/user/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import './Inscription.css';
+import '../styles/Inscription.css';
 
 export default function Register() {
-    const [nom, setNom] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [profilPic, setProfilPic] = useState('');
+    // const [profilPic, setProfilPic] = useState('');
     const [level, setLevel] = useState('débutant');
     const [isAdmin, setIsAdmin] = useState(false);
     const [bio, setBio] = useState('');
@@ -15,19 +15,20 @@ export default function Register() {
     const handleSubmit = async (e) => {
       e.preventDefault();
   
+      // Prepare user data to send to backend
       const userData = {
-        nom,
+        name,
         email,
         password,
-        profilPic,
         level,
         isAdmin,
         bio,
         location,
+        partenaire: null,
       };
   
       try {
-        const res = await fetch('http://localhost:5000/createUser', {
+        const res = await fetch('http://localhost:3002/createUser', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userData),
@@ -36,11 +37,11 @@ export default function Register() {
         const data = await res.json();
   
         if (res.ok) {
+          localStorage.setItem('token', data.token);
           setMessage('Utilisateur créé avec succès !');
-          setNom('');
+          setName('');
           setEmail('');
           setPassword('');
-          setProfilPic('');
           setLevel('');
           setIsAdmin(false);
           setBio('');
@@ -61,8 +62,8 @@ export default function Register() {
         <input
           type="text"
           placeholder="Nom"
-          value={nom}
-          onChange={(e) => setNom(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
   

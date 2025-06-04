@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './Messages.css';
+import '../styles/Messages.css';
 
 export default function Messages() {
   const [conversations, setConversations] = useState([]);
@@ -8,7 +8,7 @@ export default function Messages() {
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    fetch('http://localhost:5000/api/conversations', {
+    fetch('http://localhost:3002/api/conversations', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

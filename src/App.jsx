@@ -5,6 +5,8 @@ import Profil from './pages/Profil';
 import Messages from './pages/Messages';
 import Inscription from './pages/Inscription';
 
+// import TestCors from './pages/TestCors';
+
 function App() {
   return (
       <Routes>
