@@ -1,8 +1,11 @@
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
+import CreatePostButton from '../components/CreatePostButton';
+import useAuth from '../hooks/useAuth';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { isLoggedIn, user } = useAuth();
 
   return (
     <div className="home-container">
@@ -19,10 +22,15 @@ export default function Home() {
       </header>
 
       <main className="main">
+
+        {isLoggedIn && user && (
+        <p>Connecté en tant que <strong>{user.name}</strong></p>
+        )}
+
         <h2>Trouve ton partenaire de sport en un clic</h2>
-        {/* <button onClick={() => navigate('/login')}>
-          Commencer maintenant
-        </button> */}
+        
+        <CreatePostButton />
+
       </main>
     </div>
   );

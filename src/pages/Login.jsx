@@ -21,6 +21,7 @@ export default function Login() {
       if (res.ok) {
         setMessage('Connexion réussie !');
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = '/';
       } else {
         setMessage(data.message || 'Erreur lors de la connexion.');
