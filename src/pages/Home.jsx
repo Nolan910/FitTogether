@@ -1,6 +1,7 @@
 import '../styles/Home.css';
 import { useNavigate } from 'react-router-dom';
 import CreatePostButton from '../components/CreatePostButton';
+import HomePosts from '../components/HomePosts';
 import useAuth from '../hooks/useAuth';
 
 export default function Home() {
@@ -26,10 +27,10 @@ export default function Home() {
         {isLoggedIn && user && (
         <p>Connecté en tant que <strong>{user.name}</strong></p>
         )}
-
-        <h2>Trouve ton partenaire de sport en un clic</h2>
         
         <CreatePostButton />
+
+        <HomePosts />
 
       </main>
     </div>
