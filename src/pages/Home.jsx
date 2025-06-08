@@ -1,26 +1,15 @@
 import '../styles/Home.css';
-import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 import CreatePostButton from '../components/CreatePostButton';
 import HomePosts from '../components/HomePosts';
 import useAuth from '../hooks/useAuth';
 
 export default function Home() {
-  const navigate = useNavigate();
   const { isLoggedIn, user } = useAuth();
 
   return (
     <div className="home-container">
-      <header className="header">
-        <h1>FitTogether</h1>
-        <nav>
-          <button onClick={() => navigate('/login')}>
-            Connexion
-          </button>
-          <button onClick={() => navigate('/inscription')}>
-            Inscription
-          </button>
-        </nav>
-      </header>
+      <Header />
 
       <main className="main">
 

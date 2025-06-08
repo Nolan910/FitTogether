@@ -6,6 +6,7 @@ import Messages from './pages/Messages';
 import Inscription from './pages/Inscription';
 import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail';
+import PublicProfile from './pages/PublicProfile';
 
 // import TestCors from './pages/TestCors';
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profil" element={<Profil />} />
+        <Route path="/user/:id" element={<PublicProfile />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/create-post" element={<CreatePost />} />

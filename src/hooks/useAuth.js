@@ -1,3 +1,4 @@
+//verif si obsolète
 import { useState, useEffect } from 'react';
 
 export default function useAuth() {

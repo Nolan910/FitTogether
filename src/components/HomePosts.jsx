@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react';
 import '../styles/HomePosts.css';
 import { Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 export default function HomePosts() {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
+  const [currentUserId, setCurrentUserId] = useState('');
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUserId(decoded.userId);
+      } catch (err) {
+        console.error("Erreur de décodage du token", err);
+      }
+    }
+
     fetch('http://localhost:3002/posts')
       .then((res) => res.json())
       .then((data) => setPosts(data))
@@ -22,19 +35,34 @@ export default function HomePosts() {
         <p>Aucun post pour le moment.</p>
       ) : (
         <div className="posts-list">
-          {posts.map((post) => (
-            <Link key={post._id} to={`/post/${post._id}`} className="post-card-link">
-                <div className="post-card">
-                    <img src={`http://localhost:3002${post.imageUrl}`} alt="Post" />
-                    <p className="description">{post.description}</p>
-                    <div className="author">
-                    <img src={post.author.profilPic} alt="Author" />
+          {posts.map((post) => {
+            const isCurrentUser = post.author._id === currentUserId;
+
+            return (
+              <div key={post._id} className="post-card">
+                <Link to={`/post/${post._id}`} className="post-image-link">
+                  <img src={post.imageUrl} alt="Post" />
+                  <p className="description">{post.description}</p>
+                </Link>
+
+                {isCurrentUser ? (
+                  <div className="author">
+                    <img src={post.author.profilPic} alt="Auteur" />
                     <span>{post.author.name}</span>
+                  </div>
+                ) : (
+                  <Link to={`/user/${post.author._id}`} className="author-link">
+                    <div className="author">
+                      <img src={post.author.profilPic} alt="Auteur" />
+                      <span>{post.author.name}</span>
                     </div>
-                    <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
-                </div>
-            </Link>
-          ))}
+                  </Link>
+                )}
+
+                <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

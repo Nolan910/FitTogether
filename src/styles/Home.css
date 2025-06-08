@@ -1,5 +1,6 @@
 .home-container {
-    min-height: 100vh;
+    /* min-height: 100vh; */
+    width: 100vw;
     background-color: #f3f4f6;
     color: #1f2937;
     font-family: system-ui, sans-serif;
@@ -90,3 +91,14 @@
   background-color: #019875;
 }
   
+.profil-preview {
+  cursor: pointer;
+}
+
+.profil-pic {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}

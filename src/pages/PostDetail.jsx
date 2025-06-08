@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import useAuth from '../hooks/useAuth'; // pour récupérer l'utilisateur connecté
-import '../styles/PostDetail.css'; // CSS séparé
+import Header from '../components/Header';
+import useAuth from '../hooks/useAuth';
+import '../styles/PostDetail.css'; 
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -84,6 +85,9 @@ export default function PostDetail() {
   if (!post) return <p>Post introuvable</p>;
 
   return (
+    <>
+    <Header />
+  
     <div className="post-detail">
       <img src={`http://localhost:3002${post.imageUrl}`} alt="Photo" />
       <div className="post-author">
@@ -125,5 +129,6 @@ export default function PostDetail() {
 
       {error && <p className="error-message">{error}</p>}
     </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import '../styles/CreatePost.css';
 import { useState, useEffect } from 'react';
+import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
 
 export default function CreatePost() {
@@ -53,15 +54,38 @@ export default function CreatePost() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('description', description);
-    formData.append('author', user.id);
-    formData.append('image', imageFile);
+    // Upload image to Cloudinary
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('upload_preset', 'FitTogether_preset');
 
     try {
+      
+
+      const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dkzrgtcbw/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const cloudinaryData = await cloudinaryRes.json();
+      
+      if (!cloudinaryData.secure_url) {
+      console.error("Réponse Cloudinary inattendue :", cloudinaryData);
+      throw new Error("Échec de l'upload Cloudinary");
+      }
+
+      const imageUrl = cloudinaryData.secure_url;
+
       const res = await fetch('http://localhost:3002/createPoste', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description,
+          author: user.id || user._id,
+          imageUrl,
+        })
       });
 
       const data = await res.json();
@@ -83,46 +107,58 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="form-page">
-      <form onSubmit={handleSubmit} className="create-post-form">
-        <h2>Publier un post</h2>
+    <>
+      <Header />
 
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
+      <div className="form-page">
+        <form onSubmit={handleSubmit} className="create-post-form">
+          <h2>Publier un post</h2>
 
-        {!imageFile && (
           <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             required
           />
-        )}
 
-        {previewUrl && (
-          <div className="preview-container">
-            <img src={previewUrl} alt="Aperçu" />
-            <button type="button" onClick={handleRemoveImage}>
-              Supprimer l’image
+          {!imageFile && (
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              required
+            />
+          )}
+
+          {previewUrl && (
+            <div className="preview-container">
+              <img src={previewUrl} alt="Aperçu" />
+              <button type="button" onClick={handleRemoveImage}>
+                Supprimer l’image
+              </button>
+            </div>
+          )}
+
+          <div className="button-row">
+            <button type="submit">Publier</button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="cancel-button"
+            >
+              Annuler
             </button>
           </div>
-        )}
 
-        <div className="button-row">
-          <button type="submit">Publier</button>
-          <button type="button" onClick={handleCancel} className="cancel-button">
-            Annuler
-          </button>
-        </div>
-
-        {message && <p className={`message ${statusType === 'success' ? 'success' : 'error'}`}>{message}</p>}
-    </form>
-  </div>
+          {message && (
+            <p className={`message ${statusType === 'success' ? 'success' : 'error'}`}>
+              {message}
+            </p>
+          )}
+        </form>
+      </div>
+    </>
   );
 }
 

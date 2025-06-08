@@ -1,0 +1,83 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.posts-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.post-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.post-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-card img {
+  max-width: 100%;
+  border-radius: 1rem;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.post-card:hover {
+  transform: scale(1.02);
+}
+
+.description {
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.author img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.5rem;
+}
+
+.post-card-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.delete-button {
+  margin-top: 5px;
+  background-color: #e85261;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-radius: 100px;
+  cursor: pointer;
+  display: block;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
