@@ -8,12 +8,13 @@ export default function Header() {
 
   return (
     <header className="header">
-      <h1 onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+      <h1 onClick={() => navigate('/')} style={{ cursor: 'pointer', marginLeft: 50 }}>
         FitTogether
       </h1>
       <nav>
         {isLoggedIn && user ? (
-          <>
+          <div className="user-info">
+            <button onClick={() => navigate('/chat')}>Chat</button>
             <div><strong>{user.name}</strong></div>
             <div className="profil-preview" onClick={() => navigate('/profil')}>
               <img
@@ -22,17 +23,16 @@ export default function Header() {
                 className="profil-pic"
               />
             </div>
-          </>
+          </div>
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Connexion</button>
             <button onClick={() => navigate('/inscription')}>Inscription</button>
           </>
         )}
-
-        <button onClick={() => navigate('/login')}>Connexion</button>
-              <button onClick={() => navigate('/inscription')}>Inscription</button>
       </nav>
+      {/* <button onClick={() => navigate('/login')}>Connexion</button>
+              <button onClick={() => navigate('/inscription')}>Inscription</button> */}
     </header>
   );
 }

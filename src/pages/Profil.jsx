@@ -89,6 +89,8 @@ export default function Profil() {
     // Recharge tout l'état du profil
     await fetchUserAndRelatedData();
 
+    console.log("Statut reçu :", status);
+
     setRequestMessage(`Demande ${status === 'accepted' ? 'acceptée' : 'refusée'} avec succès`);
     setRequestMessageType('success');
 
@@ -143,8 +145,8 @@ export default function Profil() {
                     <img src={req.from.profilPic} alt="Demandeur" className="request-avatar" />
                   </Link>
                   <span>{req.from.name}</span>
-                  <button onClick={() => handleRequestResponse(req._id)}>Accepter</button>
-                  <button onClick={() => handleRequestResponse(req._id)}>Refuser</button>
+                  <button onClick={() => handleRequestResponse(req._id, 'accepted')}>Accepter</button>
+                  <button onClick={() => handleRequestResponse(req._id, 'refused')}>Refuser</button>
                   {requestMessage && (
                     <div className={`partner-message ${requestMessageType}`}>
                       {requestMessage}
@@ -172,7 +174,7 @@ export default function Profil() {
           </ul>
         )}
       </div>
-      
+
     <UserPosts />
 
   </div>

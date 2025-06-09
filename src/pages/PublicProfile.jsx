@@ -65,7 +65,7 @@ export default function PublicProfile() {
   return (
     <>
       <Header />
-    <div className="public-profile">
+    <div className="public-profil-container">
       <h2>Profil de {user.name}</h2>
       <img
         src={user.profilPic || '/default-avatar.png'}

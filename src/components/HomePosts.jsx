@@ -28,7 +28,7 @@ export default function HomePosts() {
 
   return (
     <div className="container">
-      <h2>Posts récents</h2>
+      {/* <h2>Posts récents</h2> */}
       {error && <p className="error">{error}</p>}
 
       {posts.length === 0 ? (

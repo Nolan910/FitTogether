@@ -80,11 +80,11 @@ export default function EditProfileForm({ onUpdate }) {
   return (
     <form onSubmit={handleSubmit} className="edit-profile-form">
       <label>
-        Nouveau nom :
+        Nom :
         <input value={newName} onChange={(e) => setNewName(e.target.value)} />
       </label>
       <label>
-        URL de la nouvelle photo :
+        Photo :
         <input type="file" accept="image/*" onChange={(e) => setNewProfilPic(e.target.files[0])} />
         {newProfilPic && typeof newProfilPic !== 'string' && (
             <img

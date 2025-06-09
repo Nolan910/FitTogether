@@ -7,6 +7,7 @@ import Inscription from './pages/Inscription';
 import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail';
 import PublicProfile from './pages/PublicProfile';
+import Chat from './pages/Chat';
 
 // import TestCors from './pages/TestCors';
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/create-post" element={<CreatePost />} />
         <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="/chat" element={<Chat/>} />
       </Routes>
   );
 }

@@ -2,10 +2,10 @@ import '../styles/Home.css';
 import Header from '../components/Header';
 import CreatePostButton from '../components/CreatePostButton';
 import HomePosts from '../components/HomePosts';
-import useAuth from '../hooks/useAuth';
+// import useAuth from '../hooks/useAuth';
 
 export default function Home() {
-  const { isLoggedIn, user } = useAuth();
+  // const { isLoggedIn, user } = useAuth();
 
   return (
     <div className="home-container">
@@ -13,13 +13,17 @@ export default function Home() {
 
       <main className="main">
 
-        {isLoggedIn && user && (
+        {/* {isLoggedIn && user && (
         <p>Connecté en tant que <strong>{user.name}</strong></p>
-        )}
-        
-        <CreatePostButton />
+        )} */}
+        <div className="content-container">
+          <div className="posts-header">
+            <h2>Les postes des utilisateurs</h2>
+            <CreatePostButton />
+          </div>
 
-        <HomePosts />
+          <HomePosts />
+        </div>
 
       </main>
     </div>

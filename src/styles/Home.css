@@ -102,3 +102,25 @@
   border-radius: 50%;
   border: 2px solid #ccc;
 }
+
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  /* max-width: 900px; */
+  margin: 1rem auto;
+  padding: 0 3rem 0 1rem;
+  margin-left: 2%;
+}
+
+.posts-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.content-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}

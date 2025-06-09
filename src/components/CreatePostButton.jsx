@@ -19,7 +19,8 @@ export default function CreatePostButton() {
 
   return (
     <div>
-      <button onClick={handleClick}>➕ Créer un post</button>
+      <button onClick={handleClick}
+      style={{ fontSize: '0.875rem', padding: '0.6rem 1rem' }}>➕ Publier un poste</button>
       {message && <p style={{ color: 'red' }}>{message}</p>}
     </div>
   );
