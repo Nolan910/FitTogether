@@ -15,7 +15,7 @@ export default function PostDetail() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:3002/post/${id}`);
+        const res = await fetch(`https://fittogether-back.onrender.com/post/${id}`);
         const data = await res.json();
         setPost(data);
         setLoading(false);
@@ -34,7 +34,7 @@ export default function PostDetail() {
     if (!newComment.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:3002/post/${id}/comment`, {
+      const res = await fetch(`https://fittogether-back.onrender.com/post/${id}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +64,7 @@ export default function PostDetail() {
   if (!window.confirm("Supprimer ce commentaire ?")) return;
 
   try {
-    const res = await fetch(`http://localhost:3002/comments/${commentId}`, {
+    const res = await fetch(`https://fittogether-back.onrender.com/comments/${commentId}`, {
       method: "DELETE",
     });
 
@@ -89,7 +89,7 @@ export default function PostDetail() {
     <Header />
   
     <div className="post-detail">
-      <img src={`http://localhost:3002${post.imageUrl}`} alt="Photo" />
+      <img src={`https://fittogether-back.onrender.com${post.imageUrl}`} alt="Photo" />
       <div className="post-author">
         <img src={post.author.profilPic} alt={`Photo de profil de ${post.author.name}`} className="author-picture" />
         <h2>{post.author.name}</h2>

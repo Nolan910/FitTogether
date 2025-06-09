@@ -76,7 +76,7 @@ export default function CreatePost() {
 
       const imageUrl = cloudinaryData.secure_url;
 
-      const res = await fetch('http://localhost:3002/createPoste', {
+      const res = await fetch('https://fittogether-back.onrender.com/createPoste', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

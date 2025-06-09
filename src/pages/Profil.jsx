@@ -30,13 +30,13 @@ export default function Profil() {
     const userId = user?.id || user?._id;
 
     const [userRes, requestsRes, partnersRes] = await Promise.all([
-      fetch(`http://localhost:3002/user/${userId}`, {
+      fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
-      fetch(`http://localhost:3002/user/${userId}/partner-requests`, {
+      fetch(`https://fittogether-back.onrender.com/user/${userId}/partner-requests`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
-      fetch(`http://localhost:3002/user/${userId}/partners`, {
+      fetch(`https://fittogether-back.onrender.com/user/${userId}/partners`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
     ]);
@@ -75,7 +75,7 @@ export default function Profil() {
     const token = localStorage.getItem('token');
 
   try {
-    const res = await fetch(`http://localhost:3002/partner-requests/${requestId}`, {
+    const res = await fetch(`https://fittogether-back.onrender.com/partner-requests/${requestId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

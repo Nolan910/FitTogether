@@ -13,7 +13,7 @@ export default function UserPosts() {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:3002/post/${postId}`, {
+      const res = await fetch(`https://fittogether-back.onrender.com/post/${postId}`, {
         method: 'DELETE',
       });
 
@@ -37,7 +37,7 @@ export default function UserPosts() {
       return;
     }
 
-    fetch(`http://localhost:3002/user/${userId}/posts`, {
+    fetch(`https://fittogether-back.onrender.com/user/${userId}/posts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -20,7 +20,7 @@ export default function EditProfileForm({ onUpdate }) {
       console.log('Données envoyées :', newName, newProfilPic);
 
 
-      fetch(`http://localhost:3002/user/${userId}`, {
+      fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,7 +50,7 @@ export default function EditProfileForm({ onUpdate }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:3002/user/${userId}`, {
+      const res = await fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,

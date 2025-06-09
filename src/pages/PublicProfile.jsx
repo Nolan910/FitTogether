@@ -24,7 +24,7 @@ export default function PublicProfile() {
     return;
     }
 
-    fetch(`http://localhost:3002/user/${viewedUserId}`)
+    fetch(`https://fittogether-back.onrender.com/user/${viewedUserId}`)
       .then((res) => res.json())
       .then(setUser)
       .catch(() => setError("Erreur lors du chargement du profil utilisateur"));
@@ -37,7 +37,7 @@ export default function PublicProfile() {
   try {
     console.log('Données envoyées :', { from: currentUserId, to: viewedUserId });
 
-    const res = await fetch(`http://localhost:3002/user/${viewedUserId}/request-partner`, {
+    const res = await fetch(`https://fittogether-back.onrender.com/user/${viewedUserId}/request-partner`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

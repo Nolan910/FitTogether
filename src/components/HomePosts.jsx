@@ -20,7 +20,7 @@ export default function HomePosts() {
       }
     }
 
-    fetch('http://localhost:3002/posts')
+    fetch('https://fittogether-back.onrender.com/posts')
       .then((res) => res.json())
       .then((data) => setPosts(data))
       .catch(() => setError('Erreur lors du chargement des posts.'));

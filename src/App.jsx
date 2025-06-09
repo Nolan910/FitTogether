@@ -9,7 +9,6 @@ import PostDetail from './pages/PostDetail';
 import PublicProfile from './pages/PublicProfile';
 import Chat from './pages/Chat';
 
-// import TestCors from './pages/TestCors';
 
 function App() {
   return (

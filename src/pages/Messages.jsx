@@ -8,7 +8,7 @@ export default function Messages() {
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    fetch('http://localhost:3002/api/conversations', {
+    fetch('https://fittogether-back.onrender.com/api/conversations', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

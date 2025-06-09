@@ -28,7 +28,7 @@ export default function Register() {
       };
   
       try {
-        const res = await fetch('http://localhost:3002/createUser', {
+        const res = await fetch('https://fittogether-back.onrender.com/createUser', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userData),

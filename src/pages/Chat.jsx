@@ -13,7 +13,7 @@ export default function Chat() {
   useEffect(() => {
     if (!user?._id) return;
 
-    fetch(`http://localhost:3002/user/${user._id}/partners`)
+    fetch(`https://fittogether-back.onrender.com/user/${user._id}/partners`)
       .then(res => res.json())
       .then(setPartners)
       .catch(err => console.error('Erreur chargement partenaires :', err));
@@ -22,7 +22,7 @@ export default function Chat() {
   useEffect(() => {
     if (!selectedPartner || !user?._id) return;
 
-    fetch(`http://localhost:3002/messages/${user._id}/${selectedPartner._id}`)
+    fetch(`https://fittogether-back.onrender.com/messages/${user._id}/${selectedPartner._id}`)
       .then(res => res.json())
       .then(setMessages)
       .catch(err => console.error('Erreur chargement messages :', err));
@@ -37,7 +37,7 @@ export default function Chat() {
       content: newMessage.trim()
     };
 
-    const res = await fetch('http://localhost:3002/messages', {
+    const res = await fetch('https://fittogether-back.onrender.com/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(messageToSend)
