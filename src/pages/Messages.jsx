@@ -5,6 +5,7 @@ export default function Messages() {
   const [conversations, setConversations] = useState([]);
   const [error, setError] = useState('');
 
+  // Récupération des conversations
   useEffect(() => {
     const token = localStorage.getItem('token');
 

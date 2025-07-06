@@ -27,12 +27,10 @@ export default function Header() {
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Connexion</button>
-            <button onClick={() => navigate('/inscription')}>Inscription</button>
+            <button className="auth-button" onClick={() => navigate('/inscription')}>Inscription</button>
           </>
         )}
       </nav>
-      {/* <button onClick={() => navigate('/login')}>Connexion</button>
-              <button onClick={() => navigate('/inscription')}>Inscription</button> */}
     </header>
   );
 }

@@ -1,12 +1,12 @@
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f3f4f6;
-  }
-  
-  .login-form {
+  display: flex;
+  justify-content: center;
+  margin: 4rem;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.login-form {
     background-color: white;
     padding: 2rem;
     border-radius: 1rem;
@@ -65,4 +65,17 @@
 
 .signup-link a:hover {
   text-decoration: underline;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
 }

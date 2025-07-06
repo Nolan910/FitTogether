@@ -20,6 +20,7 @@ export default function CreatePost() {
     }
   };
 
+  //Enlève l'image
   const handleRemoveImage = () => {
     setImageFile(null);
     setPreviewUrl(null);
@@ -31,6 +32,7 @@ export default function CreatePost() {
     setMessage('Publication annulée.');
   };
 
+  // Nettoyage de l'URL de prévisualisation lors de la suppression de l'image
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -39,6 +41,7 @@ export default function CreatePost() {
     };
   }, [previewUrl]);
 
+  // Envoi du post
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -61,7 +64,6 @@ export default function CreatePost() {
 
     try {
       
-
       const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dkzrgtcbw/image/upload', {
         method: 'POST',
         body: formData
@@ -83,7 +85,7 @@ export default function CreatePost() {
         },
         body: JSON.stringify({
           description,
-          author: user.id || user._id,
+          author: user._id || user.id,
           imageUrl,
         })
       });
@@ -91,7 +93,7 @@ export default function CreatePost() {
       const data = await res.json();
       if (res.ok) {
         setStatusType('success');
-        setMessage('Post créé avec succès !');
+        setMessage('Post publié !');
         setDescription('');
         setImageFile(null);
         setPreviewUrl(null);

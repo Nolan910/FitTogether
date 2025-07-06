@@ -1,21 +1,25 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 import '../styles/Inscription.css';
 
 export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // const [profilPic, setProfilPic] = useState('');
     const [level, setLevel] = useState('débutant');
     const [isAdmin, setIsAdmin] = useState(false);
     const [bio, setBio] = useState('');
     const [location, setLocation] = useState('');
     const [message, setMessage] = useState('');
+
+    const navigate = useNavigate();
   
+    //Envoi du formulaire
     const handleSubmit = async (e) => {
       e.preventDefault();
   
-      // Prepare user data to send to backend
+      // Prepare user data à envoyer au backend
       const userData = {
         name,
         email,
@@ -38,7 +42,8 @@ export default function Register() {
   
         if (res.ok) {
           localStorage.setItem('token', data.token);
-          setMessage('Utilisateur créé avec succès !');
+          setMessage('Inscription réussie !');
+          navigate('/login');
           setName('');
           setEmail('');
           setPassword('');
@@ -56,64 +61,66 @@ export default function Register() {
     };
   
     return (
-      <form onSubmit={handleSubmit} className="register-form">
-        <h2>Créer un compte</h2>
-  
-        <input
-          type="text"
-          placeholder="Nom"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-  
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-  
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-  
-        <label htmlFor="level">Niveau</label>
-        <select
-          id="level"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          required
-        >
-          <option value="débutant">Débutant</option>
-          <option value="intermédiaire">Intermédiaire</option>
-          <option value="avancé">Avancé</option>
-          <option value="expert">Expert</option>
-        </select>
-  
-        <textarea
-          placeholder="Bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          maxLength={1024}
-        />
-  
-        <input
-          type="text"
-          placeholder="Localisation"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-        />
-  
-        <button type="submit">S'inscrire</button>
-  
-        {message && <p className="message">{message}</p>}
-      </form>
+      <>
+        <Header />
+        <form onSubmit={handleSubmit} className="register-form">
+          <h2>Créer un compte</h2>
+    
+          <input
+            type="text"
+            placeholder="Nom"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+    
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+    
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+    
+          <label htmlFor="level">Niveau</label>
+          <select
+            id="level"
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            required
+          >
+            <option value="Débutant">Débutant.e</option>
+            <option value="Habitué">Habitué.e</option>
+            <option value="Experimenté">Expérimenté.e</option>
+          </select>
+    
+          <textarea
+            placeholder="Bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            maxLength={1024}
+          />
+    
+          <input
+            type="text"
+            placeholder="Localisation"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+    
+          <button type="submit">S'inscrire</button>
+    
+          {message && <p className="message">{message}</p>}
+        </form>
+      </>
     );
   }

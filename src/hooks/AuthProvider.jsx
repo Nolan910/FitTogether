@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { AuthContext } from './AuthContext';
-// import { jwtDecode } from 'jwt-decode';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Vérification du token et des données utilisateur dans le localStorage
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
     if (token && userData) {
       try {
-        // const decoded = jwtDecode(token);
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
         setIsLoggedIn(true);

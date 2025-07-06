@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Header from '../components/Header';
 import '../styles/Login.css';
 
 export default function Login() {
@@ -7,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
+  // Envoi du formulaire de connexion
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -34,32 +36,37 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="login-form">
-      <h2>Connexion</h2>
+    <>
+      <Header />
+      <div className="login-container">
+        <form onSubmit={handleSubmit} className="login-form">
+          <h2>Connexion</h2>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      <input
-        type="password"
-        placeholder="Mot de passe"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-      <button type="submit">Se connecter</button>
+          <button type="submit">Se connecter</button>
 
-      {message && <p className="message">{message}</p>}
+          {message && <p className="message">{message}</p>}
 
-      <p className="signup-link">
-        <Link to="/inscription">S'inscrire</Link>
-      </p>
-    </form>
+          <p className="signup-link">
+            <Link to="/inscription">S'inscrire</Link>
+          </p>
+        </form>
+      </div>
+    </>
   );
 }

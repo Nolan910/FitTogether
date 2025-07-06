@@ -1,4 +1,5 @@
 .header {
+  width: 100%;
   position: sticky;
   display: flex;
   justify-content: space-between;
@@ -12,6 +13,7 @@
   height: 50px;
   border-radius: 50%;
   cursor: pointer;
+  margin-right: 3rem;
 }
 
 nav {
@@ -24,4 +26,8 @@ nav {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.auth-button {
+  margin-right: 3rem;
 }

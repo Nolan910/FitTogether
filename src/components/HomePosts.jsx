@@ -8,6 +8,7 @@ export default function HomePosts() {
   const [error, setError] = useState('');
   const [currentUserId, setCurrentUserId] = useState('');
 
+  // Récupération des posts
   useEffect(() => {
 
     const token = localStorage.getItem('token');
@@ -28,9 +29,7 @@ export default function HomePosts() {
 
   return (
     <div className="container">
-      {/* <h2>Posts récents</h2> */}
       {error && <p className="error">{error}</p>}
-
       {posts.length === 0 ? (
         <p>Aucun post pour le moment.</p>
       ) : (
@@ -44,7 +43,6 @@ export default function HomePosts() {
                   <img src={post.imageUrl} alt="Post" />
                   <p className="description">{post.description}</p>
                 </Link>
-
                 {isCurrentUser ? (
                   <div className="author">
                     <img src={post.author.profilPic} alt="Auteur" />
@@ -58,7 +56,6 @@ export default function HomePosts() {
                     </div>
                   </Link>
                 )}
-
                 <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
               </div>
             );
