@@ -57,7 +57,7 @@ export default function CreatePost() {
       return;
     }
 
-    // Upload image to Cloudinary
+    // Upload image sur Cloudinary
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', 'FitTogether_preset');
@@ -66,13 +66,16 @@ export default function CreatePost() {
       
       const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dkzrgtcbw/image/upload', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
         body: formData
       });
 
       const cloudinaryData = await cloudinaryRes.json();
       
       if (!cloudinaryData.secure_url) {
-      console.error("Réponse Cloudinary inattendue :", cloudinaryData);
+      console.error("Réponse Cloudinary erreur :", cloudinaryData);
       throw new Error("Échec de l'upload Cloudinary");
       }
 
@@ -81,7 +84,8 @@ export default function CreatePost() {
       const res = await fetch('https://fittogether-back.onrender.com/createPoste', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           description,

@@ -40,7 +40,7 @@
 }
 
 .chat-message {
-  margin: 0.5rem 0;
+  margin: 0.8rem 0 0.4rem 0;
 }
 
 .chat-message span {
@@ -51,10 +51,12 @@
 }
 
 .chat-message.right {
+  margin: 0.8rem 0 0.4rem 0;
   text-align: right;
 }
 
 .chat-message.left {
+  margin: 0.8rem 0 0.4rem 0;
   text-align: left;
 }
 
@@ -107,4 +109,13 @@
   border-radius: 50%;
   cursor: pointer;
   border: 1px solid #ccc;
+}
+
+.send-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }

@@ -15,7 +15,10 @@ export default function Login() {
     try {
       const res = await fetch('https://fittogether-back.onrender.com/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+         },
         body: JSON.stringify({ email, password }),
       });
 

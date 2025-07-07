@@ -13,20 +13,16 @@ export default function UserPosts() {
   const [postToDelete, setPostToDelete] = useState(null);
 
 
-  const confirmDeletePost = (postId) => {
-  setPostToDelete(postId);
-  setShowModal(true);
-};
-
   // Récupération des posts de l'utilisateur
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const userId = profileId || user?._id;
 
-    if (!token || !profileId) {
+    if (!token || !userId) {
       return;
     }
 
-    fetch(`https://fittogether-back.onrender.com/user/${profileId}/posts`, {
+    fetch(`https://fittogether-back.onrender.com/user/${userId}/posts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -34,14 +30,22 @@ export default function UserPosts() {
       .then(res => res.json())
       .then(setPosts)
       .catch(() => setError("Erreur lors du chargement des posts de l’utilisateur."));
-  }, [profileId]);
+  }, [profileId, user]);
 
+  // Demande de confirmation de la suppression d'un post
+  const deletePost = (postId) => {
+    setPostToDelete(postId);
+    setShowModal(true);
+  };
 
   //Supression d'un post
   const handleConfirmDelete = async () => {
     try {
       const res = await fetch(`https://fittogether-back.onrender.com/post/${postToDelete}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
 
       if (res.ok) {
@@ -81,8 +85,8 @@ export default function UserPosts() {
                 <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
               </div>
             </Link>
-            {user && post.author._id === user._id && (
-              <button onClick={() => confirmDeletePost(post._id)} className="delete-button">
+            {user && (post.author._id === user._id || user.isAdmin) && (
+              <button onClick={() => deletePost(post._id)} className="delete-button">
                 Supprimer
               </button>
             )}

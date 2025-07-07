@@ -67,7 +67,7 @@ export default function PublicProfile() {
     const data = await res.json();
 
     if (res.ok) {
-      setRequestMessage('Demande envoyée avec succès.');
+      setRequestMessage('Demande de partenaire envoyée.');
     } else {
       setRequestMessage(data.message || 'Erreur lors de l’envoi de la demande.');
     }

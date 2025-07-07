@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
 import '../styles/PostDetail.css'; 
 import ConfirmModal from '../components/ConfirmModal';
+import ErrorModal from '../components/ErrorModal';
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -41,7 +42,10 @@ export default function PostDetail() {
     try {
       const res = await fetch(`https://fittogether-back.onrender.com/post/${id}/comment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
         body: JSON.stringify({
           content: newComment,
           authorId: user._id,
@@ -76,6 +80,9 @@ export default function PostDetail() {
   try {
     const res = await fetch(`https://fittogether-back.onrender.com/comments/${commentToDelete}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
     });
 
     if (res.ok) {
@@ -94,8 +101,13 @@ export default function PostDetail() {
   }
 };
 
-  if (loading) return <p>Chargement...</p>;
-  if (!post) return <p>Post introuvable</p>;
+  if (loading) {
+    return <ErrorModal message="Chargement en cours..." />;
+  }
+
+  if (!post) {
+    return <ErrorModal message="Post introuvable." />;
+  }
 
   return (
     <>
@@ -142,7 +154,7 @@ export default function PostDetail() {
                   </div>
                 </div>
                 <p className='comment-content'>{comment.content}</p>
-                {user && comment.author && (comment.author._id === user._id || comment.author === user._id) && (
+                {user && comment.author && (comment.author._id === user._id || comment.author === user._id || user.isAdmin) && (
                   <button onClick={() => handleDeleteComment(comment._id)} className="delete-comment-btn">
                     Supprimer
                   </button>

@@ -49,7 +49,10 @@ export default function Chat() {
 
     const res = await fetch('https://fittogether-back.onrender.com/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
       body: JSON.stringify(messageToSend)
     });
 
@@ -124,7 +127,7 @@ export default function Chat() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
               />
-              <button onClick={handleSend}>Envoyer</button>
+              <button className='send-button' onClick={handleSend}>Envoyer</button>
             </div>
           </>
         ) : (

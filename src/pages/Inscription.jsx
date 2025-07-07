@@ -19,7 +19,9 @@ export default function Register() {
     const handleSubmit = async (e) => {
       e.preventDefault();
   
-      // Prepare user data à envoyer au backend
+      const token = localStorage.getItem('token');
+      
+      // Prepare les données à envoyer au backend
       const userData = {
         name,
         email,
@@ -34,7 +36,10 @@ export default function Register() {
       try {
         const res = await fetch('https://fittogether-back.onrender.com/createUser', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+             },
           body: JSON.stringify(userData),
         });
   
