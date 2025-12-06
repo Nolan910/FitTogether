@@ -66,9 +66,6 @@ export default function CreatePost() {
       
       const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dkzrgtcbw/image/upload', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
         body: formData
       });
 
