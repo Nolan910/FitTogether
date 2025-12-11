@@ -166,3 +166,76 @@
   gap: 0.5rem;
 }
 
+.profil-info-card {
+  background: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  max-width: 500px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-icon {
+  font-size: 1.4rem;
+  margin-right: 10px;
+}
+
+.info-label {
+  font-weight: 600;
+  margin-right: 6px;
+  color: #1f2937;
+}
+
+.info-value {
+  color: #4b5563;
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.profil-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Contient le nom + les boutons */
+.profil-name-and-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1; /* Permet de pousser les boutons vers la droite */
+}
+
+/* Le nom */
+.profil-name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+/* Groupe des boutons */
+.profil-buttons {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 10px;
+}
+
+/* Boutons */
+.modify-profil-button, 
+.logout-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}

@@ -135,59 +135,93 @@ if (error) {
     );
   }
 
-  return (
+return (
   <>
-  <Header />
+    <Header />
     <div className="profil-container">
-    <h1>Votre profil</h1>
-    <div className="profil-header">
-      <img
-        src={user.profilPic || '/default-avatar.png'}
-        alt={`Photo de profil`}
-        className="profil-avatar" />
-      <div className="profil-infos">
-      <h2><strong> {user.name} </strong></h2>
-      </div>
-      <button className="modify-profil-button" onClick={() => setIsEditing(!isEditing)}>
-        {isEditing ? 'Fermer' : 'Modifier le profil'}
-      </button>
-      {isEditing && user && (
-        <EditProfileForm onUpdate={handleProfileUpdate } />
-      )}
-      {!isEditing && user && (
-        <button onClick={handleLogout} className="logout-button">
-          Se déconnecter
+      <h1>Votre profil</h1>
+
+      <div className="profil-header">
+        <img
+          src={user.profilPic || '/default-avatar.png'}
+          alt={`Photo de profil`}
+          className="profil-avatar"
+        />
+
+        <div className="profil-infos">
+          <h2><strong>{user.name}</strong></h2>
+        </div>
+
+        <button className="modify-profil-button" onClick={() => setIsEditing(!isEditing)}>
+          {isEditing ? 'Fermer' : 'Modifier le profil'}
         </button>
-      )}
-      
-    </div>
-    <p><strong>{user.bio}</strong> </p>
-    <p><strong>Niveau :</strong> {user.level}</p>
-    <p><strong>Localisation :</strong> {user.location}</p>
-    {partnerRequests.length > 0 && (
-          <div className="partner-requests">
-            <h3>Demandes de partenaires reçues</h3>
-            <ul>
-              {partnerRequests.map(req => (
-                <div className="request-item" key={req._id}>
-                  <Link to={`/user/${req.from._id}`} className="request-user-link">
-                    <img src={req.from.profilPic} alt="Demandeur" className="request-avatar" />
-                  </Link>
-                  <span>{req.from.name}</span>
-                  <button onClick={() => handleRequestResponse(req._id, 'accepted')}>Accepter</button>
-                  <button onClick={() => handleRequestResponse(req._id, 'refused')}>Refuser</button>
-                  {requestMessage && (
-                    <div className={`partner-message ${requestMessageType}`}>
-                      {requestMessage}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </ul>
-          </div>
+
+        {isEditing && user && (
+          <EditProfileForm onUpdate={handleProfileUpdate} />
         )}
+
+        {!isEditing && user && (
+          <button onClick={handleLogout} className="logout-button">
+            Se déconnecter
+          </button>
+        )}
+      </div>
+
+      <div className="profil-info-card">
+        <div className="info-row">
+          <span className="info-icon"></span>
+          <span className="info-label">Bio :</span>
+          <span className="info-value">{user.bio || "Aucune bio renseignée"}</span>
+        </div>
+
+        <div className="info-row">
+          <span className="info-icon"></span>
+          <span className="info-label">Niveau :</span>
+          <span className="info-value">{user.level}</span>
+        </div>
+
+        <div className="info-row">
+          <span className="info-icon"></span>
+          <span className="info-label">Localisation :</span>
+          <span className="info-value">{user.location}</span>
+        </div>
+      </div>
+
+
+      {partnerRequests.length > 0 && (
+        <div className="partner-requests">
+          <h3>Demandes de partenaires reçues</h3>
+          <ul>
+            {partnerRequests.map(req => (
+              <div className="request-item" key={req._id}>
+                <Link to={`/user/${req.from._id}`} className="request-user-link">
+                  <img src={req.from.profilPic} alt="Demandeur" className="request-avatar" />
+                </Link>
+
+                <span>{req.from.name}</span>
+
+                <button onClick={() => handleRequestResponse(req._id, 'accepted')}>
+                  Accepter
+                </button>
+
+                <button onClick={() => handleRequestResponse(req._id, 'refused')}>
+                  Refuser
+                </button>
+
+                {requestMessage && (
+                  <div className={`partner-message ${requestMessageType}`}>
+                    {requestMessage}
+                  </div>
+                )}
+              </div>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="partenaires-section">
         <h3>Partenaires</h3>
+
         {partners.length === 0 ? (
           <p>Aucun partenaire pour le moment.</p>
         ) : (
@@ -195,16 +229,18 @@ if (error) {
             {partners.map((p) => (
               <li key={p._id}>
                 <Link to={`/user/${p._id}`} className="partner-link">
-                <img src={p.profilPic || '/default-avatar.png'} alt={p.name} />
-                <span>{p.name}</span>
+                  <img src={p.profilPic || '/default-avatar.png'} alt={p.name} />
+                  <span>{p.name}</span>
                 </Link>
               </li>
             ))}
           </ul>
         )}
       </div>
-    <UserPosts />
-  </div>
+
+      <UserPosts />
+    </div>
   </>
-  );
+);
+
 }
