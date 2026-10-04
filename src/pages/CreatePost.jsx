@@ -86,7 +86,6 @@ export default function CreatePost() {
         },
         body: JSON.stringify({
           description,
-          author: user._id || user.id,
           imageUrl,
         })
       });

@@ -48,7 +48,6 @@ export default function PostDetail() {
         },
         body: JSON.stringify({
           content: newComment,
-          authorId: user._id,
         }),
       });
 

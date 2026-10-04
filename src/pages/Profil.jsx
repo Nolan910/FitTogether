@@ -204,7 +204,7 @@ return (
                   Accepter
                 </button>
 
-                <button onClick={() => handleRequestResponse(req._id, 'refused')}>
+                <button onClick={() => handleRequestResponse(req._id, 'rejected')}>
                   Refuser
                 </button>
 

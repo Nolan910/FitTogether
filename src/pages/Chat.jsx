@@ -28,7 +28,9 @@ export default function Chat() {
   useEffect(() => {
     if (!selectedPartner || !user?._id) return;
 
-    fetch(`https://fittogether-back.onrender.com/messages/${user._id}/${selectedPartner._id}`)
+    fetch(`https://fittogether-back.onrender.com/messages/${selectedPartner._id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
       .then(res => res.json())
       .then(data => {
       setMessages(data);
@@ -42,7 +44,6 @@ export default function Chat() {
     if (!newMessage.trim()) return;
 
     const messageToSend = {
-      from: user._id,
       to: selectedPartner._id,
       content: newMessage.trim()
     };

@@ -11,7 +11,6 @@ export default function PublicProfile() {
   const { id: viewedUserId } = useParams();
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
-  const [currentUserId, setCurrentUserId] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
   const [currentUserPartners, setCurrentUserPartners] = useState([]);
   const navigate = useNavigate();
@@ -23,7 +22,6 @@ export default function PublicProfile() {
     if (token) {
       const decoded = jwtDecode(token);
       const currentId = decoded.userId;
-      setCurrentUserId(decoded.userId);
 
       fetch(`https://fittogether-back.onrender.com/user/${currentId}`, {
       headers: {
@@ -58,10 +56,8 @@ export default function PublicProfile() {
     const res = await fetch(`https://fittogether-back.onrender.com/user/${viewedUserId}/request-partner`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ from: currentUserId, to: viewedUserId  }),
     });
 
     const data = await res.json();
