@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
-import '../styles/PostDetail.css'; 
+import { api } from '../api';
+import '../styles/PostDetail.css';
 import ConfirmModal from '../components/ConfirmModal';
 import ErrorModal from '../components/ErrorModal';
 
@@ -18,20 +19,10 @@ export default function PostDetail() {
 
   //Récupération du post
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const res = await fetch(`https://fittogether-back.onrender.com/post/${id}`);
-        const data = await res.json();
-        setPost(data);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Erreur lors du chargement du post');
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
+    api(`/post/${id}`)
+      .then(setPost)
+      .catch(() => setError('Erreur lors du chargement du post'))
+      .finally(() => setLoading(false));
   }, [id]);
 
   //Envoi de commentaire
@@ -40,31 +31,18 @@ export default function PostDetail() {
     if (!newComment.trim()) return;
 
     try {
-      const res = await fetch(`https://fittogether-back.onrender.com/post/${id}/comment`, {
+      const data = await api(`/post/${id}/comment`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          content: newComment,
-        }),
+        body: { content: newComment },
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setPost((prev) => ({
-          ...prev,
-          comments: [data.comment, ...prev.comments],
-        }));
-        setNewComment('');
-      } else {
-        setError(data.message || 'Erreur lors de l’ajout du commentaire');
-      }
+      setPost((prev) => ({
+        ...prev,
+        comments: [data.comment, ...prev.comments],
+      }));
+      setNewComment('');
     } catch (err) {
-        console.error(err);
-      setError('Erreur réseau');
+      setError(err.message);
     }
   };
 
@@ -77,23 +55,13 @@ export default function PostDetail() {
   const confirmDeleteComment  = async () => {
   if (!commentToDelete) return;
   try {
-    const res = await fetch(`https://fittogether-back.onrender.com/comments/${commentToDelete}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (res.ok) {
-      setPost(prev => ({
-        ...prev,
-        comments: prev.comments.filter(c => c._id !== commentToDelete),
-      }));   
-    } else {
-      console.error("Erreur lors de la suppression");
-    }
+    await api(`/comments/${commentToDelete}`, { method: 'DELETE' });
+    setPost(prev => ({
+      ...prev,
+      comments: prev.comments.filter(c => c._id !== commentToDelete),
+    }));
   } catch (err) {
-    console.error(err);
+    setError(err.message);
   } finally {
     setShowModal(false);
     setCommentToDelete(null);
@@ -112,7 +80,7 @@ export default function PostDetail() {
     <>
     <div className="page-container">
       <Header />
-    
+
       <div className="post-detail">
         <div className="post-author">
           <img src={post.author.profilPic} alt={`Photo de profil de ${post.author.name}`} className="author-picture" />
@@ -120,7 +88,7 @@ export default function PostDetail() {
         </div>
         <h3 className="post-description">{post.description}</h3>
         <img className="post-image" src={post.imageUrl} alt="Photo du poste" />
-        
+
         {user && (
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <textarea
@@ -154,7 +122,7 @@ export default function PostDetail() {
                   </div>
                 </div>
                 <p className='comment-content'>{comment.content}</p>
-                {user && comment.author && (comment.author._id === user._id || comment.author === user._id || user.isAdmin) && (
+                {user && comment.author && (comment.author._id === user._id || user.isAdmin) && (
                   <button onClick={() => handleDeleteComment(comment._id)} className="delete-comment-btn">
                     Supprimer
                   </button>

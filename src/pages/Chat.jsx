@@ -1,67 +1,53 @@
 import { useEffect, useState, useRef } from 'react';
-import { useAuthContext } from '../hooks/useAuthContext';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 import '../styles/Chat.css';
 import Header from '../components/Header';
-import ErrorModal from '../components/ErrorModal';
-import { useNavigate } from 'react-router-dom';
 
 export default function Chat() {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const [partners, setPartners] = useState([]);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
-  const navigate = useNavigate();
+  const userId = user?._id;
 
   // Récupération des partenaires
   useEffect(() => {
-    if (!user?._id) return;
+    if (!userId) return;
 
-    fetch(`https://fittogether-back.onrender.com/user/${user._id}/partners`)
-      .then(res => res.json())
+    api(`/user/${userId}/partners`)
       .then(setPartners)
       .catch(err => console.error('Erreur chargement partenaires :', err));
-  }, [user]);
+  }, [userId]);
 
   // Récupération des messages avec le partenaire
   useEffect(() => {
-    if (!selectedPartner || !user?._id) return;
+    if (!selectedPartner) return;
 
-    fetch(`https://fittogether-back.onrender.com/messages/${selectedPartner._id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
-      .then(res => res.json())
+    api(`/messages/${selectedPartner._id}`)
       .then(data => {
       setMessages(data);
       setTimeout(scrollToBottom, 100);
     })
       .catch(err => console.error('Erreur chargement messages :', err));
-  }, [selectedPartner, user]);
+  }, [selectedPartner]);
 
   // Envoi d'un message
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
-    const messageToSend = {
-      to: selectedPartner._id,
-      content: newMessage.trim()
-    };
-
-    const res = await fetch('https://fittogether-back.onrender.com/messages', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(messageToSend)
-    });
-
-    if (res.ok) {
-      const saved = await res.json();
+    try {
+      const saved = await api('/messages', {
+        method: 'POST',
+        body: { to: selectedPartner._id, content: newMessage.trim() },
+      });
       setMessages(prev => [...prev, saved]);
       setNewMessage('');
       scrollToBottom();
+    } catch (err) {
+      console.error("Erreur lors de l'envoi du message :", err);
     }
   };
 
@@ -71,16 +57,6 @@ export default function Chat() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  if (!user) {
-      return (
-        <ErrorModal
-          message="Veuillez vous connectez afin d'avoir accès au chat"
-          onClose={() => navigate(-1)} 
-        />
-      );
-    }
-
 
   return (
   <>
@@ -102,13 +78,13 @@ export default function Chat() {
           <>
             <h3>Discussion avec {selectedPartner.name}</h3>
             <div className="chat-box">
-              {messages.map((msg, index) => {
+              {messages.map((msg) => {
                 const isMe = msg.from === user._id;
                 const sender = isMe ? user : selectedPartner;
 
                 return (
                   <div
-                    key={index}
+                    key={msg._id}
                     className={`chat-message ${isMe ? 'right' : 'left'}`}
                   >
                     <img

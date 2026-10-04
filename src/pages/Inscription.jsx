@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import { api } from '../api';
 import '../styles/Inscription.css';
 
 export default function Register() {
@@ -13,7 +14,7 @@ export default function Register() {
     const [message, setMessage] = useState('');
 
     const navigate = useNavigate();
-  
+
     //Envoi du formulaire
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -29,40 +30,19 @@ export default function Register() {
       };
 
       try {
-        const res = await fetch('https://fittogether-back.onrender.com/createUser', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-             },
-          body: JSON.stringify(userData),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          setMessage('Inscription réussie !');
-          navigate('/login');
-          setName('');
-          setEmail('');
-          setPassword('');
-          setLevel('Débutant');
-          setBio('');
-          setLocation('');
-        } else {
-          setMessage(data.message || 'Erreur lors de la création');
-        }
+        await api('/createUser', { method: 'POST', body: userData });
+        navigate('/login');
       } catch (err) {
-        console.error(err);
-        setMessage('Erreur serveur. Veuillez réessayer.');
+        setMessage(err.message);
       }
     };
-  
+
     return (
       <>
         <Header />
         <form onSubmit={handleSubmit} className="register-form">
           <h2>Créer un compte</h2>
-    
+
           <input
             type="text"
             placeholder="Nom"
@@ -70,7 +50,7 @@ export default function Register() {
             onChange={(e) => setName(e.target.value)}
             required
           />
-    
+
           <input
             type="email"
             placeholder="Email"
@@ -78,7 +58,7 @@ export default function Register() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-    
+
           <input
             type="password"
             placeholder="Mot de passe"
@@ -90,7 +70,7 @@ export default function Register() {
             title="8 caractères minimum, avec au moins une lettre et un chiffre"
             required
           />
-    
+
           <label htmlFor="level">Niveau</label>
           <select
             id="level"
@@ -102,14 +82,14 @@ export default function Register() {
             <option value="Habitué">Habitué.e</option>
             <option value="Experimenté">Expérimenté.e</option>
           </select>
-    
+
           <textarea
             placeholder="Bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             maxLength={1024}
           />
-    
+
           <input
             type="text"
             placeholder="Localisation"
@@ -117,9 +97,9 @@ export default function Register() {
             onChange={(e) => setLocation(e.target.value)}
             required
           />
-    
+
           <button type="submit">S'inscrire</button>
-    
+
           {message && <p className="message">{message}</p>}
         </form>
       </>

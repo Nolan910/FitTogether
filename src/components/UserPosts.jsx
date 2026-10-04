@@ -2,35 +2,29 @@ import { useEffect, useState } from 'react';
 import '../styles/UserPosts.css';
 import ConfirmModal from '../components/ConfirmModal';
 import { useParams, Link } from 'react-router-dom';
-import { useAuthContext } from '../hooks/useAuthContext';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 
 export default function UserPosts() {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const { id: profileId } = useParams();
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
+  const userId = profileId || user?._id;
 
 
   // Récupération des posts de l'utilisateur
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userId = profileId || user?._id;
-
-    if (!token || !userId) {
+    if (!userId) {
       return;
     }
 
-    fetch(`https://fittogether-back.onrender.com/user/${userId}/posts`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => res.json())
+    api(`/user/${userId}/posts`)
       .then(setPosts)
       .catch(() => setError("Erreur lors du chargement des posts de l’utilisateur."));
-  }, [profileId, user]);
+  }, [userId]);
 
   // Demande de confirmation de la suppression d'un post
   const deletePost = (postId) => {
@@ -41,21 +35,10 @@ export default function UserPosts() {
   //Supression d'un post
   const handleConfirmDelete = async () => {
     try {
-      const res = await fetch(`https://fittogether-back.onrender.com/post/${postToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (res.ok) {
-        setPosts(prev => prev.filter(post => post._id !== postToDelete));
-      } else {
-        alert("Erreur lors de la suppression.");
-      }
+      await api(`/post/${postToDelete}`, { method: 'DELETE' });
+      setPosts(prev => prev.filter(post => post._id !== postToDelete));
     } catch (err) {
-      console.error(err);
-      alert("Erreur réseau.");
+      setError(err.message);
     } finally {
       setShowModal(false);
       setPostToDelete(null);

@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../hooks/useAuthContext';
+import useAuth from '../hooks/useAuth';
 import '../styles/Header.css';
 
 export default function Header() {
   const navigate = useNavigate();
-  const { isLoggedIn, user } = useAuthContext();
+  const { isLoggedIn, user } = useAuth();
 
   return (
     <header className="header">

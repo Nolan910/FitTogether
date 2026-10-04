@@ -1,10 +1,9 @@
 import '../styles/CreatePost.css';
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 
 export default function CreatePost() {
-  const { user, isLoggedIn } = useAuth();
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -45,12 +44,6 @@ export default function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isLoggedIn || !user) {
-      setStatusType('error');
-      setMessage("Utilisateur non identifié. Veuillez vous connecter.");
-      return;
-    }
-
     if (!imageFile) {
       setStatusType('error');
       setMessage("Veuillez sélectionner une image.");
@@ -62,29 +55,16 @@ export default function CreatePost() {
     formData.append('image', imageFile);
 
     try {
-      const res = await fetch('https://fittogether-back.onrender.com/createPoste', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-      });
+      await api('/createPoste', { method: 'POST', body: formData });
 
-      const data = await res.json();
-      if (res.ok) {
-        setStatusType('success');
-        setMessage('Post publié !');
-        setDescription('');
-        setImageFile(null);
-        setPreviewUrl(null);
-      } else {
-        setStatusType('error');
-        setMessage(data.message || 'Erreur lors de la création');
-      }
+      setStatusType('success');
+      setMessage('Post publié !');
+      setDescription('');
+      setImageFile(null);
+      setPreviewUrl(null);
     } catch (err) {
-      console.error(err);
       setStatusType('error');
-      setMessage('Erreur réseau. Veuillez réessayer.');
+      setMessage(err.message);
     }
   };
 

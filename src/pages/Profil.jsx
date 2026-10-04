@@ -1,15 +1,16 @@
 import '../styles/Profil.css';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../hooks/useAuthContext';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 import Header from '../components/Header';
 import UserPosts from '../components/UserPosts';
 import EditProfileForm from '../components/EditProfileForm';
 import ErrorModal from '../components/ErrorModal';
 
 export default function Profil() {
-  const { user, setUser } = useAuthContext();
+  const { user, updateUser, logout } = useAuth();
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [partners, setPartners] = useState([]);
@@ -17,43 +18,18 @@ export default function Profil() {
   const [isEditing, setIsEditing] = useState(false);
   const [requestMessage, setRequestMessage] = useState('');
   const [requestMessageType, setRequestMessageType] = useState('');
-  
+  const userId = user?._id;
+
   //Récupére l'utilisateur ses données
-  const fetchUserAndRelatedData = async () => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-
-    if (!token || !userData) {
-      setError('Utilisateur non connecté.');
-      return;
-    }
-
+  const fetchUserAndRelatedData = useCallback(async () => {
     try {
-      const userId = user?.id || user?._id;
-
-      const [userRes, requestsRes, partnersRes] = await Promise.all([
-        fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`https://fittogether-back.onrender.com/user/${userId}/partner-requests`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`https://fittogether-back.onrender.com/user/${userId}/partners`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      if (!userRes.ok || !requestsRes.ok || !partnersRes.ok) {
-        throw new Error("Erreur lors du chargement des données.");
-      }
-
       const [userInfo, requests, partners] = await Promise.all([
-        userRes.json(),
-        requestsRes.json(),
-        partnersRes.json(),
+        api(`/user/${userId}`),
+        api(`/user/${userId}/partner-requests`),
+        api(`/user/${userId}/partners`),
       ]);
 
-      setUser(userInfo);
+      updateUser(userInfo);
       setPartnerRequests(requests);
       setPartners(partners);
 
@@ -61,39 +37,28 @@ export default function Profil() {
       console.error("Erreur lors de la récupération :", err);
       setError("Erreur de chargement.");
     }
-  };
+  }, [userId, updateUser]);
 
   useEffect(() => {
     fetchUserAndRelatedData();
-  }, [navigate]);
+  }, [fetchUserAndRelatedData]);
 
 // Mise à jour du profil après modification
   const handleProfileUpdate = (updatedUser) => {
-  setUser(updatedUser); 
-  localStorage.setItem('user', JSON.stringify(updatedUser));
-  fetchUserAndRelatedData(); 
+  updateUser(updatedUser);
+  fetchUserAndRelatedData();
 };
 
   // Gestion de la réponse à une demande de partenaire
   const handleRequestResponse = async (requestId, status) => {
-    const token = localStorage.getItem('token');
-
   try {
-    const res = await fetch(`https://fittogether-back.onrender.com/partner-requests/${requestId}`, {
+    await api(`/partner-requests/${requestId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ status }),
+      body: { status },
     });
-
-    if (!res.ok) throw new Error("Erreur lors de la mise à jour");
 
     // Recharge tout l'état du profil
     await fetchUserAndRelatedData();
-
-    console.log("Statut reçu :", status);
 
     setRequestMessage(`Demande ${status === 'accepted' ? 'acceptée' : 'refusée'} avec succès`);
     setRequestMessageType('success');
@@ -103,28 +68,17 @@ export default function Profil() {
     }, 3000);
 
   } catch (err) {
-    console.error(err);
-    alert("Erreur lors de la réponse à la demande");
+    setRequestMessage(err.message);
+    setRequestMessageType('error');
   }
 
 };
 
 // Déconnexion
   const handleLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  setUser(null);
-  navigate('/login'); 
+  logout();
+  navigate('/login');
 };
-
-if (!user) {
-    return (
-      <ErrorModal
-        message="Veuillez vous connectez afin d'avoir accès à votre profil"
-        onClose={() => navigate('/login')} 
-      />
-    );
-  }
 
 if (error) {
     return (
@@ -156,11 +110,11 @@ return (
           {isEditing ? 'Fermer' : 'Modifier le profil'}
         </button>
 
-        {isEditing && user && (
+        {isEditing && (
           <EditProfileForm onUpdate={handleProfileUpdate} />
         )}
 
-        {!isEditing && user && (
+        {!isEditing && (
           <button onClick={handleLogout} className="logout-button">
             Se déconnecter
           </button>

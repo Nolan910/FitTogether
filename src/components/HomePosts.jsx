@@ -1,29 +1,19 @@
 import { useEffect, useState } from 'react';
 import '../styles/HomePosts.css';
 import { Link } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 
 export default function HomePosts() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
-  const [currentUserId, setCurrentUserId] = useState('');
+  const currentUserId = user?._id;
 
   // Récupération des posts
   useEffect(() => {
-
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setCurrentUserId(decoded.userId);
-      } catch (err) {
-        console.error("Erreur de décodage du token", err);
-      }
-    }
-
-    fetch('https://fittogether-back.onrender.com/posts')
-      .then((res) => res.json())
-      .then((data) => setPosts(data))
+    api('/posts')
+      .then(setPosts)
       .catch(() => setError('Erreur lors du chargement des posts.'));
   }, []);
 

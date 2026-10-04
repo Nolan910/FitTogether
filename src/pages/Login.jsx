@@ -1,40 +1,32 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 import '../styles/Login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Envoi du formulaire de connexion
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch('https://fittogether-back.onrender.com/login', {
+      const data = await api('/login', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-         },
-        body: JSON.stringify({ email, password }),
+        body: { email, password },
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage('Connexion réussie !');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        window.location.href = '/';
-      } else {
-        setMessage(data.message || 'Erreur lors de la connexion.');
-      }
+      login(data.token, data.user);
+      navigate(location.state?.from?.pathname || '/', { replace: true });
     } catch (err) {
-      console.error(err);
-      setMessage('Erreur serveur. Veuillez réessayer.');
+      setMessage(err.message);
     }
   };
 

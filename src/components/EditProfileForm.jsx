@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import '../styles/EditProfileForm.css';
-import { jwtDecode } from 'jwt-decode';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 
 export default function EditProfileForm({ onUpdate }) {
+  const { user: currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [newName, setNewName] = useState('');
   const [newProfilPic, setNewProfilPic] = useState(null);
@@ -11,43 +13,28 @@ export default function EditProfileForm({ onUpdate }) {
   const [newLocation, setNewLocation] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const userId = currentUser?._id;
 
   // Récupération des données de l'utilisateur
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return setError("Utilisateur non connecté.");
+    if (!userId) return;
 
-    try {
-      const decoded = jwtDecode(token);
-      const userId = decoded.userId;
-
-      fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    api(`/user/${userId}`)
+      .then(data => {
+        setUser(data);
+        // Initialise les champs avec les données actuelles
+        setNewName(data.name || '');
+        setNewBio(data.bio || '');
+        setNewLevel(data.level || '');
+        setNewLocation(data.location || '');
+        setNewProfilPic(data.profilPic || '');
       })
-        .then(res => res.json())
-        .then(data => {
-          setUser(data);
-          // Initialise les champs avec les données actuelles
-          setNewName(data.name || '');
-          setNewBio(data.bio || '');
-          setNewLevel(data.level || '');
-          setNewLocation(data.location || '');
-          setNewProfilPic(data.profilPic || '');
-        })
-        .catch(() => setError("Erreur lors du chargement du profil"));
-    } catch (err) {
-      console.error(err);
-      setError("Token invalide");
-    }
-  }, []);
+      .catch(() => setError("Erreur lors du chargement du profil"));
+  }, [userId]);
 
   //Validation du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    const userId = user?._id;
 
     const formData = new FormData();
     formData.append('name', newName);
@@ -59,20 +46,10 @@ export default function EditProfileForm({ onUpdate }) {
     formData.append('location', newLocation);
 
     try {
-
-      const res = await fetch(`https://fittogether-back.onrender.com/user/${userId}`, {
+      const updatedUser = await api(`/user/${userId}`, {
         method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       });
-
-      if (!res.ok) throw new Error('Erreur lors de la mise à jour.');
-
-      const updatedUser = await res.json();
-
-      localStorage.setItem('user', JSON.stringify(updatedUser));
 
       setSuccess("Profil mis à jour !");
       setError('');
@@ -80,8 +57,8 @@ export default function EditProfileForm({ onUpdate }) {
       if (onUpdate) onUpdate(updatedUser);
 
     } catch (err) {
-      console.error(err);
-      setError("Échec de mise à jour du profil.");
+      setSuccess('');
+      setError(err.message);
     }
   };
 
@@ -91,8 +68,8 @@ export default function EditProfileForm({ onUpdate }) {
     <form onSubmit={handleSubmit} className="edit-profile-form">
       <label>
         Nom :
-        <input 
-          value={newName} 
+        <input
+          value={newName}
           onChange={(e) => setNewName(e.target.value)} />
       </label>
       <label>
@@ -120,9 +97,9 @@ export default function EditProfileForm({ onUpdate }) {
       </label>
       <label>
         Photo :
-        <input 
-          type="file" 
-          accept="image/*" 
+        <input
+          type="file"
+          accept="image/*"
           onChange={(e) => setNewProfilPic(e.target.files[0])} />
           {newProfilPic && typeof newProfilPic !== 'string' && (
             <img

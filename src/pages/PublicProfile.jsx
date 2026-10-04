@@ -5,69 +5,39 @@ import ErrorModal from '../components/ErrorModal';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import useAuth from '../hooks/useAuth';
+import { api } from '../api';
 
 export default function PublicProfile() {
   const { id: viewedUserId } = useParams();
+  const { user: currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
-  const [currentUserId, setCurrentUserId] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
   const [currentUserPartners, setCurrentUserPartners] = useState([]);
   const navigate = useNavigate();
+  const currentUserId = currentUser?._id;
 
   // Récupération des infos du profil et si il est partenaire
   useEffect(() => {
-
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decoded = jwtDecode(token);
-      const currentId = decoded.userId;
-      setCurrentUserId(currentId);
-
-      fetch(`https://fittogether-back.onrender.com/user/${currentId}/partners`)
-      .then((res) => res.json())
-      .then((data) => {
-        setCurrentUserPartners(Array.isArray(data) ? data : []);
-      })
+    api(`/user/${currentUserId}/partners`)
+      .then(setCurrentUserPartners)
       .catch(() => {
         console.error("Erreur lors du chargement des partenaires");
       });
 
-    }else {
-      setRequestMessage('Vous devez être connecté pour envoyer une demande.');
-    return;
-    }
-
-    fetch(`https://fittogether-back.onrender.com/user/${viewedUserId}`)
-      .then((res) => res.json())
+    api(`/user/${viewedUserId}`)
       .then(setUser)
       .catch(() => setError("Erreur lors du chargement du profil utilisateur"));
-  }, [viewedUserId]);
+  }, [viewedUserId, currentUserId]);
 
   // Envoi de la demande de partenaire
   const handleSendRequest = async () => {
-  
-  const token = localStorage.getItem('token');
-
   try {
-    const res = await fetch(`https://fittogether-back.onrender.com/user/${viewedUserId}/request-partner`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      setRequestMessage('Demande de partenaire envoyée.');
-    } else {
-      setRequestMessage(data.message || 'Erreur lors de l’envoi de la demande.');
-    }
-  } catch (error) {
-    console.error('Erreur lors de l’envoi de la demande :', error);
-    setRequestMessage('Erreur réseau.');
+    await api(`/user/${viewedUserId}/request-partner`, { method: 'POST' });
+    setRequestMessage('Demande de partenaire envoyée.');
+  } catch (err) {
+    setRequestMessage(err.message);
   }
 };
 
@@ -82,14 +52,9 @@ export default function PublicProfile() {
         />
       );
     }
-  
+
     if (!user) {
-      return (
-        <ErrorModal
-          message="Veuillez vous connectez afin d'avoir accès aux profils des autres utilisateurs"
-          onClose={() => navigate('/login')} 
-        />
-      );
+      return <ErrorModal message="Chargement en cours..." />;
     }
 
   return (
