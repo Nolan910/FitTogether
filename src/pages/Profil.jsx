@@ -60,7 +60,7 @@ export default function Profil() {
     // Recharge tout l'état du profil
     await fetchUserAndRelatedData();
 
-    setRequestMessage(`Demande ${status === 'accepted' ? 'acceptée' : 'refusée'} avec succès`);
+    setRequestMessage(status === 'accepted' ? 'Demande acceptée' : 'Demande refusée');
     setRequestMessageType('success');
 
     setTimeout(() => {
