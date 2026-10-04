@@ -127,6 +127,7 @@ export default function PostDetail() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Ajouter un commentaire"
+              maxLength={500}
               required
             />
             <button type="submit">Commenter</button>

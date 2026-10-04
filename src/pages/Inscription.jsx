@@ -7,8 +7,7 @@ export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [level, setLevel] = useState('débutant');
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [level, setLevel] = useState('Débutant');
     const [bio, setBio] = useState('');
     const [location, setLocation] = useState('');
     const [message, setMessage] = useState('');
@@ -18,42 +17,35 @@ export default function Register() {
     //Envoi du formulaire
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
-      const token = localStorage.getItem('token');
-      
+
       // Prepare les données à envoyer au backend
       const userData = {
         name,
         email,
         password,
         level,
-        isAdmin,
         bio,
         location,
-        partenaire: null,
       };
-  
+
       try {
         const res = await fetch('https://fittogether-back.onrender.com/createUser', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
              },
           body: JSON.stringify(userData),
         });
-  
+
         const data = await res.json();
-  
+
         if (res.ok) {
-          localStorage.setItem('token', data.token);
           setMessage('Inscription réussie !');
           navigate('/login');
           setName('');
           setEmail('');
           setPassword('');
-          setLevel('');
-          setIsAdmin(false);
+          setLevel('Débutant');
           setBio('');
           setLocation('');
         } else {
@@ -92,6 +84,10 @@ export default function Register() {
             placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            maxLength={72}
+            pattern="(?=.*[A-Za-z])(?=.*\d).{8,72}"
+            title="8 caractères minimum, avec au moins une lettre et un chiffre"
             required
           />
     

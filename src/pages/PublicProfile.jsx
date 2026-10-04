@@ -11,6 +11,7 @@ export default function PublicProfile() {
   const { id: viewedUserId } = useParams();
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
+  const [currentUserId, setCurrentUserId] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
   const [currentUserPartners, setCurrentUserPartners] = useState([]);
   const navigate = useNavigate();
@@ -22,15 +23,12 @@ export default function PublicProfile() {
     if (token) {
       const decoded = jwtDecode(token);
       const currentId = decoded.userId;
+      setCurrentUserId(currentId);
 
-      fetch(`https://fittogether-back.onrender.com/user/${currentId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      })
+      fetch(`https://fittogether-back.onrender.com/user/${currentId}/partners`)
       .then((res) => res.json())
       .then((data) => {
-        setCurrentUserPartners(data.partners || []);
+        setCurrentUserPartners(Array.isArray(data) ? data : []);
       })
       .catch(() => {
         console.error("Erreur lors du chargement des partenaires");
@@ -73,7 +71,8 @@ export default function PublicProfile() {
   }
 };
 
-  const isPartner = currentUserPartners.some(p => p._id === viewedUserId || p === viewedUserId);
+  const isOwnProfile = currentUserId === viewedUserId;
+  const isPartner = currentUserPartners.some(p => p._id === viewedUserId);
 
   if (error) {
       return (
@@ -106,7 +105,7 @@ export default function PublicProfile() {
       <p><strong>{user.bio}</strong> </p>
       <p><strong>Niveau :</strong> {user.level}</p>
       <p><strong>Localisation :</strong> {user.location}</p>
-      {isPartner ? (
+      {isOwnProfile ? null : isPartner ? (
         <p className="already-partner-msg">Tu es partenaire avec {user.name} !</p>
       ) : (
         <button onClick={handleSendRequest} className="partner-request-button">

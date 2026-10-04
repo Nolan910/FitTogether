@@ -127,6 +127,7 @@ export default function Chat() {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
+                maxLength={1000}
               />
               <button className='send-button' onClick={handleSend}>Envoyer</button>
             </div>
