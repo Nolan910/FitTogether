@@ -1,5 +1,7 @@
 # FitTogether
 
+[![CI](https://github.com/Nolan910/FitTogether/actions/workflows/ci.yml/badge.svg)](https://github.com/Nolan910/FitTogether/actions/workflows/ci.yml)
+
 Application sportive pour trouver des partenaires de sport, publier des photos de ses séances et discuter avec ses partenaires.
 
 API : [FitTogether-CDA](https://github.com/Nolan910/FitTogether-CDA)
@@ -59,6 +61,7 @@ src/
 - La session est fermée automatiquement à l'expiration du token, ou dès que l'API répond 401.
 - Les pages `/profil`, `/user/:id`, `/create-post` et `/chat` sont protégées par `ProtectedRoute`. Après la connexion, l'utilisateur revient sur la page qu'il voulait ouvrir.
 
-## Déploiement
+## Intégration et déploiement continus
 
-Le front est déployé sur Vercel, qui redéploie automatiquement à chaque push sur `master`.
+- **CI (GitHub Actions)** : à chaque push et à chaque pull request sur `master`, le workflow `.github/workflows/ci.yml` installe les dépendances, lance ESLint puis construit l'application.
+- **CD (Vercel)** : le front est redéployé automatiquement à chaque push sur `master`. Chaque pull request reçoit aussi un déploiement de prévisualisation.
