@@ -27,7 +27,7 @@ L'URL de l'API est lue dans la variable `VITE_API_URL` :
 | `.env.development` | `npm run dev` | `http://localhost:3000` (API lancée en local) |
 | `.env.production` | `npm run build` (Vercel) | `https://fittogether-back.onrender.com` |
 
-Pour utiliser une autre URL en local sans modifier ces fichiers, créer un fichier `.env.development.local` (ignoré par Git).
+Pour utiliser une autre URL en local sans modifier ces fichiers, créer un fichier `.env.development.local`.
 
 ## Scripts
 
@@ -41,7 +41,7 @@ Pour utiliser une autre URL en local sans modifier ces fichiers, créer un fichi
 
 ## Tests
 
-Les tests tournent dans un DOM simulé (jsdom), avec un `fetch` simulé : ils n'appellent jamais la vraie API. Ils couvrent :
+Les tests tournent avec un `fetch` simulé : ils n'appellent jamais la vraie API. Ils couvrent :
 
 - `api.js` : ajout du token, envoi en JSON ou en `FormData`, déconnexion sur une réponse 401, message en cas de coupure réseau ;
 - `ProtectedRoute` : redirection sans session ou avec un token expiré, déconnexion quand l'API répond 401 ;
