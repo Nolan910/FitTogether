@@ -88,7 +88,7 @@ Le front est hébergé sur Vercel
 |---|---|---|
 | CI (`.github/workflows/ci.yml`) | Push et pull request sur `master` | `npm ci` → `npm audit --omit=dev --audit-level=critical` → ESLint → tests → build |
 | Prévisualisation Vercel | Chaque pull request | Un déploiement de test avec sa propre URL, pour vérifier les changements avant fusion |
-| Production Vercel | Push sur `master` | `npm run build`, puis mise en ligne |
+| Production Vercel | Push sur `master` | `npm run build`, puis mise en ligne seulement quand la CI est verte (Deployment Checks) |
 | Dependabot (`.github/dependabot.yml`) | Chaque semaine | Pull requests de mise à jour des dépendances npm et des actions GitHub |
 
 ### Procédure de mise en production
@@ -108,6 +108,7 @@ Le front est hébergé sur Vercel
 | Framework | Vite |
 | Build command | `npm run build` |
 | Production branch | `master` |
+| Deployment Checks | Job GitHub *Lint, tests et build* : une version n'est mise en production qu'une fois ce job vert |
 
 ### Retour à une version précédente (rollback)
 
