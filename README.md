@@ -37,6 +37,15 @@ Pour utiliser une autre URL en local sans modifier ces fichiers, créer un fichi
 | `npm run build` | Construit la version de production |
 | `npm run preview` | Sert la version construite |
 | `npm run lint` | Vérifie le code avec ESLint |
+| `npm test` | Lance les tests (Vitest et React Testing Library) |
+
+## Tests
+
+Les tests tournent dans un DOM simulé (jsdom), avec un `fetch` simulé : ils n'appellent jamais la vraie API. Ils couvrent :
+
+- `api.js` : ajout du token, envoi en JSON ou en `FormData`, déconnexion sur une réponse 401, message en cas de coupure réseau ;
+- `ProtectedRoute` : redirection sans session ou avec un token expiré, déconnexion quand l'API répond 401 ;
+- le formulaire de connexion : retour sur la page demandée après connexion, affichage de l'erreur renvoyée par l'API.
 
 ## Architecture
 
@@ -63,5 +72,7 @@ src/
 
 ## Intégration et déploiement continus
 
-- **CI (GitHub Actions)** : à chaque push et à chaque pull request sur `master`, le workflow `.github/workflows/ci.yml` installe les dépendances, lance ESLint puis construit l'application.
+- **CI (GitHub Actions)** : à chaque push et à chaque pull request sur `master`, le workflow `.github/workflows/ci.yml` installe les dépendances, vérifie qu'aucune dépendance de production n'a de faille critique (`npm audit`), lance ESLint et les tests, puis construit l'application.
+- **Version de Node** : fixée à 22 par le champ `engines` du `package.json`, lu à la fois par la CI et par Vercel.
+- **Dépendances** : Dependabot propose chaque semaine des pull requests de mise à jour (npm et GitHub Actions).
 - **CD (Vercel)** : le front est redéployé automatiquement à chaque push sur `master`. Chaque pull request reçoit aussi un déploiement de prévisualisation.

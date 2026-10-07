@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Lint et build
+    name: Lint, tests et build
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -24,14 +24,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: package.json
           cache: npm
 
       - name: Installation des dépendances
         run: npm ci
 
+      - name: Audit de sécurité des dépendances
+        run: npm audit --omit=dev --audit-level=critical
+
       - name: Lint
         run: npm run lint
+
+      - name: Tests
+        run: npm test
 
       - name: Build
         run: npm run build
