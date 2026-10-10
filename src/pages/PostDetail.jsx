@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Header from '../components/Header';
+import Avatar from '../components/Avatar';
+import ConfirmModal from '../components/ConfirmModal';
 import useAuth from '../hooks/useAuth';
+import usePageTitle from '../hooks/usePageTitle';
 import { api } from '../api';
 import '../styles/PostDetail.css';
-import ConfirmModal from '../components/ConfirmModal';
-import ErrorModal from '../components/ErrorModal';
+
+const formatDateTime = (value) => new Date(value).toLocaleString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -14,8 +23,8 @@ export default function PostDetail() {
   const [newComment, setNewComment] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
+  usePageTitle(post ? post.description : 'Post');
 
   //Récupération du post
   useEffect(() => {
@@ -41,106 +50,132 @@ export default function PostDetail() {
         comments: [data.comment, ...prev.comments],
       }));
       setNewComment('');
+      setError('');
     } catch (err) {
       setError(err.message);
     }
   };
 
   //Suppression de commentaire
-  const handleDeleteComment = (commentId) => {
-  setCommentToDelete(commentId);
-  setShowModal(true);
+  const confirmDeleteComment = async () => {
+    if (!commentToDelete) return;
+    try {
+      await api(`/comments/${commentToDelete}`, { method: 'DELETE' });
+      setPost(prev => ({
+        ...prev,
+        comments: prev.comments.filter(c => c._id !== commentToDelete),
+      }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCommentToDelete(null);
+    }
   };
 
-  const confirmDeleteComment  = async () => {
-  if (!commentToDelete) return;
-  try {
-    await api(`/comments/${commentToDelete}`, { method: 'DELETE' });
-    setPost(prev => ({
-      ...prev,
-      comments: prev.comments.filter(c => c._id !== commentToDelete),
-    }));
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setShowModal(false);
-    setCommentToDelete(null);
-  }
-};
-
-  if (loading) {
-    return <ErrorModal message="Chargement en cours..." />;
-  }
-
-  if (!post) {
-    return <ErrorModal message="Post introuvable." />;
-  }
+  const author = post?.author || {};
+  const isOwnPost = user && author._id === user._id;
 
   return (
     <>
-    <div className="page-container">
       <Header />
+      <main id="contenu" tabIndex={-1} className="page">
+        {loading && <p className="status" role="status">Chargement du post…</p>}
 
-      <div className="post-detail">
-        <div className="post-author">
-          <img src={post.author.profilPic} alt={`Photo de profil de ${post.author.name}`} className="author-picture" />
-          <h2>{post.author.name}</h2>
-        </div>
-        <h3 className="post-description">{post.description}</h3>
-        <img className="post-image" src={post.imageUrl} alt="Photo du poste" />
-
-        {user && (
-          <form onSubmit={handleCommentSubmit} className="comment-form">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Ajouter un commentaire"
-              maxLength={500}
-              required
-            />
-            <button type="submit">Commenter</button>
-          </form>
+        {!loading && !post && (
+          <div className="empty-state">
+            <h1>Post introuvable</h1>
+            <p>Ce post n'existe pas ou a été supprimé. <Link to="/">Retour au fil d'actualité</Link></p>
+          </div>
         )}
-        <h2>Commentaires</h2>
-        {post.comments.length === 0 ? (
-          <p className="no-comments">Pas de commentaires pour l'instant.</p>
-        ) : (
-          <ul className="comments-list">
-            {post.comments.map((comment) => (
-              <li key={comment._id} className="comment-item">
-                <div className="comment-header">
-                  <img
-                    src={comment.author?.profilPic || '/default-avatar.png'}
-                    alt={`Profil de ${comment.author?.name || 'utilisateur'}`}
-                    className="comment-avatar"
-                  />
-                  <div>
-                    <strong>{comment.author?.name}</strong>
-                    <span className="comment-date">
-                      {new Date(comment.createdAt).toLocaleString()}
-                    </span>
-                  </div>
+
+        {post && (
+          <div className="post-detail">
+            <div className="post-detail-media">
+              <img src={post.imageUrl} alt={post.description} />
+            </div>
+
+            <div className="card post-detail-panel">
+              <div className="post-detail-author">
+                <Avatar src={author.profilPic} name={author.name} size={44} />
+                <div>
+                  {isOwnPost ? (
+                    <span className="post-detail-author-name">{author.name}</span>
+                  ) : (
+                    <Link to={`/user/${author._id}`} className="post-detail-author-name">{author.name}</Link>
+                  )}
+                  <p className="muted post-detail-date">
+                    <time dateTime={post.createdAt}>{formatDateTime(post.createdAt)}</time>
+                  </p>
                 </div>
-                <p className='comment-content'>{comment.content}</p>
-                {user && comment.author && (comment.author._id === user._id || user.isAdmin) && (
-                  <button onClick={() => handleDeleteComment(comment._id)} className="delete-comment-btn">
-                    Supprimer
-                  </button>
+              </div>
+
+              <h1 className="post-detail-title">{post.description}</h1>
+
+              <section aria-labelledby="commentaires" className="comments">
+                <h2 id="commentaires">Commentaires ({post.comments.length})</h2>
+
+                {user ? (
+                  <form onSubmit={handleCommentSubmit} className="comment-form">
+                    <label htmlFor="new-comment" className="field-label">Ajouter un commentaire</label>
+                    <textarea
+                      id="new-comment"
+                      className="input"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      maxLength={500}
+                      aria-describedby={error ? 'comment-error' : undefined}
+                      required
+                    />
+                    <button type="submit" className="btn btn-primary btn-sm">Commenter</button>
+                  </form>
+                ) : (
+                  <p className="muted"><Link to="/login" state={{ from: { pathname: `/post/${id}` } }}>Connectez-vous</Link> pour commenter.</p>
                 )}
-              </li>
-            ))}
-          </ul>
+
+                {error && <p id="comment-error" className="alert alert-error" role="alert">{error}</p>}
+
+                {post.comments.length === 0 ? (
+                  <p className="muted">Pas de commentaires pour l'instant.</p>
+                ) : (
+                  <ul className="comments-list">
+                    {post.comments.map((comment) => (
+                      <li key={comment._id} className="comment-item">
+                        <Avatar src={comment.author?.profilPic} name={comment.author?.name} size={32} />
+                        <div className="comment-body">
+                          <p className="comment-header">
+                            <span className="comment-author">{comment.author?.name || 'Utilisateur supprimé'}</span>
+                            <time dateTime={comment.createdAt} className="comment-date">{formatDateTime(comment.createdAt)}</time>
+                          </p>
+                          <p className="comment-content">{comment.content}</p>
+                          {user && comment.author && (comment.author._id === user._id || user.isAdmin) && (
+                            <button
+                              type="button"
+                              onClick={() => setCommentToDelete(comment._id)}
+                              className="btn btn-link-danger btn-sm"
+                              aria-label={`Supprimer le commentaire de ${comment.author.name}`}
+                            >
+                              Supprimer
+                            </button>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            </div>
+          </div>
         )}
-        {error && <p className="error-message">{error}</p>}
-      </div>
-    </div>
-     {showModal && (
-      <ConfirmModal
-        message="Supprimer ce commentaire ?"
-        onConfirm={confirmDeleteComment}
-        onCancel={() => setShowModal(false)}
-      />
-    )}
+      </main>
+
+      {commentToDelete && (
+        <ConfirmModal
+          title="Supprimer ce commentaire ?"
+          message="Le commentaire sera définitivement supprimé."
+          onConfirm={confirmDeleteComment}
+          onCancel={() => setCommentToDelete(null)}
+        />
+      )}
     </>
   );
 }
