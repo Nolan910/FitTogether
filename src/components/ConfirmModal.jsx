@@ -1,16 +1,25 @@
-import React from 'react';
-import '../styles/ConfirmModal.css';
+import Modal from './Modal';
 
-export default function ConfirmModal({ message, onConfirm, onCancel }) {
+export default function ConfirmModal({
+  message,
+  onConfirm,
+  onCancel,
+  title = 'Confirmer la suppression',
+  confirmLabel = 'Supprimer',
+}) {
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <p>{message}</p>
-        <div className="modal-buttons">
-          <button className="confirm" onClick={onConfirm}>Oui</button>
-          <button className="cancel" onClick={onCancel}>Non</button>
-        </div>
-      </div>
-    </div>
+    <Modal
+      role="alertdialog"
+      title={title}
+      onClose={onCancel}
+      actions={(
+        <>
+          <button type="button" className="btn btn-secondary" onClick={onCancel}>Annuler</button>
+          <button type="button" className="btn btn-danger" onClick={onConfirm}>{confirmLabel}</button>
+        </>
+      )}
+    >
+      <p>{message}</p>
+    </Modal>
   );
 }

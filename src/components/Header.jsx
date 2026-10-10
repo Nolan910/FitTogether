@@ -1,36 +1,52 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import Avatar from './Avatar';
 import '../styles/Header.css';
 
 export default function Header() {
-  const navigate = useNavigate();
   const { isLoggedIn, user } = useAuth();
 
   return (
-    <header className="header">
-      <h1 onClick={() => navigate('/')} style={{ cursor: 'pointer', marginLeft: 50 }}>
-        FitTogether
-      </h1>
-      <nav>
-        {isLoggedIn && user ? (
-          <div className="user-info">
-            <button onClick={() => navigate('/chat')}>Chat</button>
-            <div><strong>{user.name}</strong></div>
-            <div className="profil-preview" onClick={() => navigate('/profil')}>
-              <img
-                src={user.profilPic}
-                alt={`Photo de profil de ${user.name || 'utilisateur'}`}
-                className="profil-pic"
-              />
-            </div>
-          </div>
-        ) : (
-          <>
-            <button onClick={() => navigate('/login')}>Connexion</button>
-            <button className="auth-button" onClick={() => navigate('/inscription')}>Inscription</button>
-          </>
-        )}
-      </nav>
-    </header>
+    <>
+      <a href="#contenu" className="skip-link">Aller au contenu</a>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <Link to="/" className="brand">
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11" />
+              </svg>
+            </span>
+            FitTogether
+          </Link>
+
+          <nav aria-label="Navigation principale">
+            {isLoggedIn && user ? (
+              <ul className="nav-list">
+                <li>
+                  <NavLink to="/chat" className="btn btn-ghost">Messages</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/profil" className="nav-profile">
+                    <Avatar src={user.profilPic} name={user.name} size={32} />
+                    <span className="nav-profile-name">{user.name}</span>
+                    <span className="sr-only"> : mon profil</span>
+                  </NavLink>
+                </li>
+              </ul>
+            ) : (
+              <ul className="nav-list">
+                <li>
+                  <NavLink to="/login" className="btn btn-secondary">Connexion</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/inscription" className="btn btn-primary">Inscription</NavLink>
+                </li>
+              </ul>
+            )}
+          </nav>
+        </div>
+      </header>
+    </>
   );
 }

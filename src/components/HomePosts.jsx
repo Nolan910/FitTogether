@@ -1,57 +1,42 @@
 import { useEffect, useState } from 'react';
-import '../styles/HomePosts.css';
-import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { api } from '../api';
+import PostCard from './PostCard';
 
 export default function HomePosts() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [error, setError] = useState('');
-  const currentUserId = user?._id;
+  const [status, setStatus] = useState('loading');
 
   // Récupération des posts
   useEffect(() => {
     api('/posts')
-      .then(setPosts)
-      .catch(() => setError('Erreur lors du chargement des posts.'));
+      .then((data) => {
+        setPosts(data);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
   }, []);
 
-  return (
-    <div className="container">
-      {error && <p className="error">{error}</p>}
-      {posts.length === 0 ? (
-        <p>Aucun post pour le moment.</p>
-      ) : (
-        <div className="posts-list">
-          {posts.map((post) => {
-            const isCurrentUser = post.author._id === currentUserId;
+  if (status === 'loading') {
+    return <p className="status" role="status">Chargement des posts…</p>;
+  }
 
-            return (
-              <div key={post._id} className="post-card">
-                <Link to={`/post/${post._id}`} className="post-image-link">
-                  <img src={post.imageUrl} alt="Post" />
-                  <p className="description">{post.description}</p>
-                </Link>
-                {isCurrentUser ? (
-                  <div className="author">
-                    <img src={post.author.profilPic} alt="Auteur" />
-                    <span>{post.author.name}</span>
-                  </div>
-                ) : (
-                  <Link to={`/user/${post.author._id}`} className="author-link">
-                    <div className="author">
-                      <img src={post.author.profilPic} alt="Auteur" />
-                      <span>{post.author.name}</span>
-                    </div>
-                  </Link>
-                )}
-                <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+  if (status === 'error') {
+    return <p className="alert alert-error" role="alert">Erreur lors du chargement des posts.</p>;
+  }
+
+  if (posts.length === 0) {
+    return <p className="empty-state">Aucun post pour le moment.</p>;
+  }
+
+  return (
+    <ul className="post-grid">
+      {posts.map((post) => (
+        <li key={post._id}>
+          <PostCard post={post} headingLevel={2} currentUserId={user?._id} />
+        </li>
+      ))}
+    </ul>
   );
 }
