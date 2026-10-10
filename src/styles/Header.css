@@ -31,20 +31,10 @@
   text-decoration: none;
 }
 
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
+.brand-logo {
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-control);
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.brand-mark svg {
-  width: 18px;
-  height: 18px;
 }
 
 .nav-list {

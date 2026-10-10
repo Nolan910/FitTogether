@@ -12,11 +12,7 @@ export default function Header() {
       <header className="site-header">
         <div className="site-header-inner">
           <Link to="/" className="brand">
-            <span className="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <path d="M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11" />
-              </svg>
-            </span>
+            <img src="/logo-96.png" alt="" width="32" height="32" className="brand-logo" />
             FitTogether
           </Link>
 

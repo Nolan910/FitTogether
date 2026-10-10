@@ -11,7 +11,6 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [level, setLevel] = useState('Débutant');
-    const [bio, setBio] = useState('');
     const [location, setLocation] = useState('');
     const [message, setMessage] = useState('');
 
@@ -27,7 +26,6 @@ export default function Register() {
         email,
         password,
         level,
-        bio,
         location,
       };
 
@@ -45,7 +43,7 @@ export default function Register() {
         <main id="contenu" tabIndex={-1} className="page auth-page">
           <div className="card auth-card">
             <h1>Créer un compte</h1>
-            <p className="page-subtitle">Les champs marqués d'un astérisque (*) sont obligatoires.</p>
+            <p className="page-subtitle">* Obligatoire</p>
 
             <form onSubmit={handleSubmit} className="form-stack">
               <div className="field">
@@ -122,17 +120,6 @@ export default function Register() {
                   onChange={(e) => setLocation(e.target.value)}
                   maxLength={100}
                   required
-                />
-              </div>
-
-              <div className="field">
-                <label htmlFor="register-bio">Bio</label>
-                <textarea
-                  id="register-bio"
-                  className="input"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  maxLength={1024}
                 />
               </div>
 
