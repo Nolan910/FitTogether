@@ -47,6 +47,14 @@
   color: var(--color-primary-hover);
 }
 
+.chat-unread {
+  width: 9px;
+  height: 9px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
 .chat-main {
   display: flex;
   flex-direction: column;

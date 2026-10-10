@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from './AuthContext';
 import { setUnauthorizedHandler } from '../api';
+import { createSocket } from '../realtime';
 
 const EMPTY_SESSION = { token: null, user: null };
 
@@ -43,6 +44,7 @@ const readStoredSession = () => {
 
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(readStoredSession);
+  const [socket, setSocket] = useState(null);
 
   const login = useCallback((token, user) => {
     localStorage.setItem('token', token);
@@ -71,6 +73,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (!session.token) return;
 
+    const newSocket = createSocket(session.token);
+    setSocket(newSocket);
+    return () => {
+      newSocket.disconnect();
+      setSocket(null);
+    };
+  }, [session.token]);
+
+  useEffect(() => {
+    if (!session.token) return;
+
     const expiry = getTokenExpiry(session.token);
     const timer = setTimeout(logout, Math.max(expiry - Date.now(), 0));
     return () => clearTimeout(timer);
@@ -82,7 +95,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
-  }), [session, login, logout, updateUser]);
+    socket,
+  }), [session, login, logout, updateUser, socket]);
 
   return (
     <AuthContext.Provider value={value}>

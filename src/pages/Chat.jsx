@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import usePageTitle from '../hooks/usePageTitle';
@@ -9,22 +9,45 @@ import Avatar from '../components/Avatar';
 
 export default function Chat() {
   usePageTitle('Messages');
-  const { user } = useAuth();
+  const { user, socket } = useAuth();
   const [partners, setPartners] = useState([]);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState('');
+  const [unread, setUnread] = useState(() => new Set());
   const messagesBoxRef = useRef(null);
+  const selectedPartnerRef = useRef(null);
   const userId = user?._id;
 
+  useEffect(() => {
+    selectedPartnerRef.current = selectedPartner;
+  }, [selectedPartner]);
+
   // Scroll vers le bas de la conversation
-  const scrollToBottom = () => {
-    const box = messagesBoxRef.current;
-    if (box) {
-      box.scrollTop = box.scrollHeight;
-    }
-  };
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      const box = messagesBoxRef.current;
+      if (box) {
+        box.scrollTop = box.scrollHeight;
+      }
+    }, 0);
+  }, []);
+
+  const addMessage = useCallback((message) => {
+    setMessages(prev => (prev.some(m => m._id === message._id) ? prev : [...prev, message]));
+    scrollToBottom();
+  }, [scrollToBottom]);
+
+  const loadConversation = useCallback((partnerId) => {
+    api(`/messages/${partnerId}`)
+      .then(data => {
+        if (selectedPartnerRef.current?._id !== partnerId) return;
+        setMessages(data);
+        scrollToBottom();
+      })
+      .catch(err => console.error('Erreur chargement messages :', err));
+  }, [scrollToBottom]);
 
   // Récupération des partenaires
   useEffect(() => {
@@ -38,14 +61,45 @@ export default function Chat() {
   // Récupération des messages avec le partenaire
   useEffect(() => {
     if (!selectedPartner) return;
+    loadConversation(selectedPartner._id);
+  }, [selectedPartner, loadConversation]);
 
-    api(`/messages/${selectedPartner._id}`)
-      .then(data => {
-        setMessages(data);
-        setTimeout(scrollToBottom, 0);
-      })
-      .catch(err => console.error('Erreur chargement messages :', err));
-  }, [selectedPartner]);
+  // Réception des messages en temps réel
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (message) => {
+      const otherId = message.from === userId ? message.to : message.from;
+      if (selectedPartnerRef.current?._id === otherId) {
+        addMessage(message);
+      } else if (message.from !== userId) {
+        setUnread(prev => new Set(prev).add(otherId));
+      }
+    };
+
+    const handleReconnect = () => {
+      if (selectedPartnerRef.current) {
+        loadConversation(selectedPartnerRef.current._id);
+      }
+    };
+
+    socket.on('message:new', handleNewMessage);
+    socket.on('connect', handleReconnect);
+    return () => {
+      socket.off('message:new', handleNewMessage);
+      socket.off('connect', handleReconnect);
+    };
+  }, [socket, userId, addMessage, loadConversation]);
+
+  const selectPartner = (partner) => {
+    setSelectedPartner(partner);
+    setMessages([]);
+    setUnread(prev => {
+      const next = new Set(prev);
+      next.delete(partner._id);
+      return next;
+    });
+  };
 
   // Envoi d'un message
   const handleSend = async (e) => {
@@ -57,10 +111,9 @@ export default function Chat() {
         method: 'POST',
         body: { to: selectedPartner._id, content: newMessage.trim() },
       });
-      setMessages(prev => [...prev, saved]);
+      addMessage(saved);
       setNewMessage('');
       setError('');
-      setTimeout(scrollToBottom, 0);
     } catch (err) {
       setError(err.message);
     }
@@ -91,11 +144,16 @@ export default function Chat() {
                       <button
                         type="button"
                         className="chat-partner"
-                        onClick={() => setSelectedPartner(partner)}
+                        onClick={() => selectPartner(partner)}
                         aria-current={isSelected ? 'true' : undefined}
                       >
                         <Avatar src={partner.profilPic} name={partner.name} size={36} />
                         <span>{partner.name}</span>
+                        {unread.has(partner._id) && (
+                          <span className="chat-unread">
+                            <span className="sr-only">(nouveau message)</span>
+                          </span>
+                        )}
                       </button>
                     </li>
                   );
