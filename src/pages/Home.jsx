@@ -5,14 +5,22 @@ import CreatePostButton from '../components/CreatePostButton';
 import HomePosts from '../components/HomePosts';
 import usePageTitle from '../hooks/usePageTitle';
 
+const NOTICES = {
+  published: 'Votre post a été publié.',
+  accountDeleted: 'Votre compte a été supprimé.',
+};
+
 export default function Home() {
   usePageTitle("Fil d'actualité");
   const location = useLocation();
   const navigate = useNavigate();
-  const [justPublished] = useState(() => Boolean(location.state?.published));
+  const [notice] = useState(() => {
+    const key = Object.keys(NOTICES).find((name) => location.state?.[name]);
+    return key ? NOTICES[key] : '';
+  });
 
   useEffect(() => {
-    if (location.state?.published) {
+    if (location.state?.published || location.state?.accountDeleted) {
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location, navigate]);
@@ -28,8 +36,8 @@ export default function Home() {
           </div>
           <CreatePostButton />
         </div>
-        {justPublished && (
-          <p className="alert alert-success home-alert" role="status">Votre post a été publié.</p>
+        {notice && (
+          <p className="alert alert-success home-alert" role="status">{notice}</p>
         )}
         <HomePosts />
       </main>

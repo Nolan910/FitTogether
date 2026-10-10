@@ -1,5 +1,5 @@
 import '../styles/Profil.css';
-import { useCallback, useEffect, useState } from 'react';
+import { startTransition, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
@@ -9,6 +9,7 @@ import Header from '../components/Header';
 import Avatar from '../components/Avatar';
 import UserPosts from '../components/UserPosts';
 import EditProfileForm from '../components/EditProfileForm';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Profil() {
   usePageTitle('Mon profil');
@@ -20,6 +21,8 @@ export default function Profil() {
   const [isEditing, setIsEditing] = useState(false);
   const [requestMessage, setRequestMessage] = useState('');
   const [requestMessageType, setRequestMessageType] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const userId = user?._id;
 
   //Récupére l'utilisateur ses données
@@ -81,6 +84,20 @@ export default function Profil() {
     navigate('/login');
   };
 
+  // Suppression du compte
+  const handleDeleteAccount = async () => {
+    try {
+      await api('/deleteUser', { method: 'DELETE' });
+      startTransition(() => {
+        navigate('/', { replace: true, state: { accountDeleted: true } });
+        logout();
+      });
+    } catch (err) {
+      setShowDeleteModal(false);
+      setDeleteError(err.message);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -122,7 +139,12 @@ export default function Profil() {
 
         {isEditing && (
           <div id="edit-profile" className="section">
-            <EditProfileForm onUpdate={handleProfileUpdate} onCancel={() => setIsEditing(false)} />
+            <EditProfileForm
+              onUpdate={handleProfileUpdate}
+              onCancel={() => setIsEditing(false)}
+              onRequestDelete={() => setShowDeleteModal(true)}
+              deleteError={deleteError}
+            />
           </div>
         )}
 
@@ -193,6 +215,16 @@ export default function Profil() {
 
         <UserPosts />
       </main>
+
+      {showDeleteModal && (
+        <ConfirmModal
+          title="Supprimer votre compte ?"
+          message="Cette action est définitive. Toutes vos données seront effacées et ne pourront pas être récupérées."
+          confirmLabel="Supprimer définitivement"
+          onConfirm={handleDeleteAccount}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </>
   );
 }

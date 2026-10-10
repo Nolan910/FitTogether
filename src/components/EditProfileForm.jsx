@@ -3,7 +3,7 @@ import '../styles/EditProfileForm.css';
 import useAuth from '../hooks/useAuth';
 import { api } from '../api';
 
-export default function EditProfileForm({ onUpdate, onCancel }) {
+export default function EditProfileForm({ onUpdate, onCancel, onRequestDelete, deleteError }) {
   const { user: currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [newName, setNewName] = useState('');
@@ -153,6 +153,21 @@ export default function EditProfileForm({ onUpdate, onCancel }) {
         {onCancel && <button type="button" className="btn btn-secondary" onClick={onCancel}>Annuler</button>}
         <button type="submit" className="btn btn-primary">Enregistrer</button>
       </div>
+
+      {onRequestDelete && (
+        <div className="danger-zone" role="group" aria-labelledby="delete-account-title">
+          <h3 id="delete-account-title">Supprimer mon compte</h3>
+          <p className="muted">
+            Votre profil, vos posts et leurs photos, vos commentaires, vos messages et vos demandes de partenariat seront définitivement effacés.
+          </p>
+          {deleteError && <p className="alert alert-error" role="alert">{deleteError}</p>}
+          <div>
+            <button type="button" className="btn btn-danger" onClick={onRequestDelete}>
+              Supprimer mon compte
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
