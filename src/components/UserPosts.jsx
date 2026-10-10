@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import '../styles/UserPosts.css';
-import ConfirmModal from '../components/ConfirmModal';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import ConfirmModal from './ConfirmModal';
+import PostCard from './PostCard';
 import useAuth from '../hooks/useAuth';
 import { api } from '../api';
 
@@ -10,10 +10,8 @@ export default function UserPosts() {
   const { id: profileId } = useParams();
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
   const userId = profileId || user?._id;
-
 
   // Récupération des posts de l'utilisateur
   useEffect(() => {
@@ -26,11 +24,7 @@ export default function UserPosts() {
       .catch(() => setError("Erreur lors du chargement des posts de l’utilisateur."));
   }, [userId]);
 
-  // Demande de confirmation de la suppression d'un post
-  const deletePost = (postId) => {
-    setPostToDelete(postId);
-    setShowModal(true);
-  };
+  const canDelete = (post) => user && (post.author._id === user._id || user.isAdmin);
 
   //Supression d'un post
   const handleConfirmDelete = async () => {
@@ -40,51 +34,40 @@ export default function UserPosts() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setShowModal(false);
       setPostToDelete(null);
     }
   };
 
   return (
-    <div className="container">
-  <h2>Posts publiés</h2>
-  {error && <p className="error">{error}</p>}
+    <section className="section" aria-labelledby="posts-publies">
+      <h2 id="posts-publies">Posts publiés</h2>
+      {error && <p className="alert alert-error" role="alert">{error}</p>}
 
-  {posts.length === 0 ? (
-    <p>Pas encore de publications</p>
-  ) : (
-    <div className="posts-list">
-      {posts.map((post) => {
-        return (
-          <div key={post._id} className="post-card-wrapper">
-            <Link to={`/post/${post._id}`} className="post-card-link">
-              <div className="post-card">
-                <img src={post.imageUrl} alt="Post" />
-                <p className="description">{post.description}</p>
-                <div className="author">
-                  <img src={post.author.profilPic} alt="Auteur" />
-                  <span>{post.author.name}</span>
-                </div>
-                <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
-              </div>
-            </Link>
-            {user && (post.author._id === user._id || user.isAdmin) && (
-              <button onClick={() => deletePost(post._id)} className="delete-button">
-                Supprimer
-              </button>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  )}
-      {showModal && (
+      {posts.length === 0 ? (
+        <p className="empty-state">Pas encore de publications.</p>
+      ) : (
+        <ul className="post-grid">
+          {posts.map((post) => (
+            <li key={post._id}>
+              <PostCard
+                post={post}
+                headingLevel={3}
+                linkAuthor={false}
+                onDelete={canDelete(post) ? setPostToDelete : undefined}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {postToDelete && (
         <ConfirmModal
-          message="Voulez-vous vraiment supprimer ce post ?"
+          title="Supprimer ce post ?"
+          message="Le post et ses commentaires seront définitivement supprimés."
           onConfirm={handleConfirmDelete}
-          onCancel={() => setShowModal(false)}
+          onCancel={() => setPostToDelete(null)}
         />
       )}
-    </div>
+    </section>
   );
 }
