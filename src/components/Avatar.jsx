@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { cloudinaryUrl, isCloudinaryUrl } from '../utils/cloudinaryImage';
 
 export default function Avatar({ src, name = '', size = 32, alt = '' }) {
   const [failedSrc, setFailedSrc] = useState(null);
@@ -13,11 +14,16 @@ export default function Avatar({ src, name = '', size = 32, alt = '' }) {
     );
   }
 
+  const square = (dimension) => cloudinaryUrl(src, { width: dimension, height: dimension, crop: 'fill' });
+
   return (
     <img
       className="avatar"
       style={style}
-      src={src}
+      src={square(size * 2)}
+      srcSet={isCloudinaryUrl(src) ? `${square(size)} 1x, ${square(size * 2)} 2x, ${square(size * 3)} 3x` : undefined}
+      width={size}
+      height={size}
       alt={alt}
       onError={() => setFailedSrc(src)}
     />

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Avatar from './Avatar';
+import { cloudinarySrcSet, cloudinaryUrl } from '../utils/cloudinaryImage';
 
 const formatDate = (value) => new Date(value).toLocaleDateString('fr-FR', {
   day: 'numeric',
@@ -20,7 +21,14 @@ export default function PostCard({ post, headingLevel = 2, linkAuthor = true, cu
 
   return (
     <article className="post-card">
-      <img className="post-card-media" src={post.imageUrl} alt={post.description} loading="lazy" />
+      <img
+        className="post-card-media"
+        src={cloudinaryUrl(post.imageUrl, { width: 800 })}
+        srcSet={cloudinarySrcSet(post.imageUrl, [400, 800, 1200])}
+        sizes="(min-width: 960px) 340px, (min-width: 600px) calc(50vw - 40px), calc(100vw - 32px)"
+        alt={post.description}
+        loading="lazy"
+      />
       <div className="post-card-body">
         <Heading className="post-card-title">
           <Link to={`/post/${post._id}`}>{post.description}</Link>

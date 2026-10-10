@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import useAuth from '../hooks/useAuth';
 import usePageTitle from '../hooks/usePageTitle';
 import { api } from '../api';
+import { cloudinarySrcSet, cloudinaryUrl } from '../utils/cloudinaryImage';
 import '../styles/PostDetail.css';
 
 const formatDateTime = (value) => new Date(value).toLocaleString('fr-FR', {
@@ -91,7 +92,12 @@ export default function PostDetail() {
         {post && (
           <div className="post-detail">
             <div className="post-detail-media">
-              <img src={post.imageUrl} alt={post.description} />
+              <img
+                src={cloudinaryUrl(post.imageUrl, { width: 1280 })}
+                srcSet={cloudinarySrcSet(post.imageUrl, [640, 960, 1280, 1920])}
+                sizes="(min-width: 1120px) 640px, (min-width: 900px) 58vw, calc(100vw - 32px)"
+                alt={post.description}
+              />
             </div>
 
             <div className="card post-detail-panel">
