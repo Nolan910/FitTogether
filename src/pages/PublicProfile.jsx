@@ -1,5 +1,5 @@
 import '../styles/Profil.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import UserPosts from '../components/UserPosts';
 import Header from '../components/Header';
@@ -13,39 +13,76 @@ export default function PublicProfile() {
   const { user: currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
-  const [requestMessage, setRequestMessage] = useState('');
-  const [requestMessageType, setRequestMessageType] = useState('');
-  const [currentUserPartners, setCurrentUserPartners] = useState([]);
+  const [requestError, setRequestError] = useState('');
+  const [relationship, setRelationship] = useState(null);
+  const sentBadgeRef = useRef(null);
+  const justSentRef = useRef(false);
   const currentUserId = currentUser?._id;
+  const isOwnProfile = currentUserId === viewedUserId;
   usePageTitle(user ? `Profil de ${user.name}` : 'Profil');
 
-  // Récupération des infos du profil et si il est partenaire
+  // Récupération des infos du profil et de la relation avec l'utilisateur connecté
   useEffect(() => {
-    api(`/user/${currentUserId}/partners`)
-      .then(setCurrentUserPartners)
-      .catch(() => {
-        console.error("Erreur lors du chargement des partenaires");
-      });
+    setRelationship(null);
+    setRequestError('');
+
+    if (!isOwnProfile) {
+      api(`/user/${viewedUserId}/relationship`)
+        .then((data) => setRelationship(data.status))
+        .catch(() => setRelationship('none'));
+    }
 
     api(`/user/${viewedUserId}`)
       .then(setUser)
       .catch(() => setError("Erreur lors du chargement du profil utilisateur."));
-  }, [viewedUserId, currentUserId]);
+  }, [viewedUserId, isOwnProfile]);
+
+  useEffect(() => {
+    if (relationship === 'sent' && justSentRef.current) {
+      justSentRef.current = false;
+      sentBadgeRef.current?.focus();
+    }
+  }, [relationship]);
 
   // Envoi de la demande de partenaire
   const handleSendRequest = async () => {
     try {
       await api(`/user/${viewedUserId}/request-partner`, { method: 'POST' });
-      setRequestMessage('Demande de partenaire envoyée.');
-      setRequestMessageType('success');
+      setRequestError('');
+      justSentRef.current = true;
+      setRelationship('sent');
     } catch (err) {
-      setRequestMessage(err.message);
-      setRequestMessageType('error');
+      setRequestError(err.message);
     }
   };
 
-  const isOwnProfile = currentUserId === viewedUserId;
-  const isPartner = currentUserPartners.some(p => p._id === viewedUserId);
+  const renderRelationship = () => {
+    if (isOwnProfile) {
+      return <Link to="/profil" className="btn btn-secondary">Gérer mon profil</Link>;
+    }
+    if (relationship === 'partners') {
+      return <p className="partner-badge">Vous êtes partenaires</p>;
+    }
+    if (relationship === 'sent') {
+      return <p ref={sentBadgeRef} tabIndex={-1} className="request-badge">Demande envoyée</p>;
+    }
+    if (relationship === 'received') {
+      return (
+        <>
+          <p className="request-badge">Demande reçue</p>
+          <Link to="/profil" className="btn btn-primary">Répondre</Link>
+        </>
+      );
+    }
+    if (relationship === 'none') {
+      return (
+        <button type="button" onClick={handleSendRequest} className="btn btn-primary">
+          Demander en partenaire
+        </button>
+      );
+    }
+    return null;
+  };
 
   return (
     <>
@@ -79,26 +116,13 @@ export default function PublicProfile() {
                 </dl>
                 <p className="profile-bio">{user.bio || 'Aucune bio renseignée.'}</p>
               </div>
-              <div className="profile-hero-actions">
-                {isOwnProfile ? (
-                  <Link to="/profil" className="btn btn-secondary">Gérer mon profil</Link>
-                ) : isPartner ? (
-                  <p className="partner-badge">Vous êtes partenaires</p>
-                ) : (
-                  <button type="button" onClick={handleSendRequest} className="btn btn-primary">
-                    Demander en partenaire
-                  </button>
-                )}
+              <div className="profile-hero-actions" aria-live="polite">
+                {renderRelationship()}
               </div>
             </section>
 
-            {requestMessage && (
-              <p
-                className={`alert section ${requestMessageType === 'error' ? 'alert-error' : 'alert-success'}`}
-                role={requestMessageType === 'error' ? 'alert' : 'status'}
-              >
-                {requestMessage}
-              </p>
+            {requestError && (
+              <p className="alert alert-error section" role="alert">{requestError}</p>
             )}
 
             <UserPosts />
