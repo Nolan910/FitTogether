@@ -1,14 +1,18 @@
 import '../styles/CreatePost.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
+import usePageTitle from '../hooks/usePageTitle';
 import { api } from '../api';
 
 export default function CreatePost() {
+  usePageTitle('Publier un post');
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [statusType, setStatusType] = useState('');
   const [message, setMessage] = useState('');
+  const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -23,11 +27,15 @@ export default function CreatePost() {
   const handleRemoveImage = () => {
     setImageFile(null);
     setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleCancel = () => {
     setDescription('');
     handleRemoveImage();
+    setStatusType('');
     setMessage('Publication annulée.');
   };
 
@@ -58,70 +66,84 @@ export default function CreatePost() {
       await api('/createPoste', { method: 'POST', body: formData });
 
       setStatusType('success');
-      setMessage('Post publié !');
+      setMessage('Post publié.');
       setDescription('');
-      setImageFile(null);
-      setPreviewUrl(null);
+      handleRemoveImage();
     } catch (err) {
       setStatusType('error');
       setMessage(err.message);
     }
   };
 
+  const imageError = statusType === 'error' && !imageFile;
+
   return (
     <>
       <Header />
 
-      <div className="form-page">
-        <form onSubmit={handleSubmit} className="create-post-form">
-          <h2>Publier un post</h2>
+      <main id="contenu" tabIndex={-1} className="page page-narrow">
+        <div className="page-header">
+          <div>
+            <h1>Publier un post</h1>
+            <p className="page-subtitle">Partagez votre dernière séance avec la communauté.</p>
+          </div>
+        </div>
 
-          <input
-            type="text"
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={500}
-            required
-          />
-
-          {!imageFile && (
+        <form onSubmit={handleSubmit} className="card form-stack create-post-form">
+          <div className="field">
+            <label htmlFor="post-description">Description *</label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
+              id="post-description"
+              className="input"
+              type="text"
+              placeholder="Séance jambes, 45 minutes"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={500}
               required
             />
-          )}
+          </div>
+
+          <div className="field">
+            <label htmlFor="post-image">Photo *</label>
+            <input
+              id="post-image"
+              ref={fileInputRef}
+              className="input input-file"
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={handleImageChange}
+              aria-describedby={imageError ? 'post-image-hint post-message' : 'post-image-hint'}
+              aria-invalid={imageError ? 'true' : undefined}
+            />
+            <p id="post-image-hint" className="field-hint">JPG ou PNG, 5 Mo maximum.</p>
+          </div>
 
           {previewUrl && (
             <div className="preview-container">
-              <img src={previewUrl} alt="Aperçu" />
-              <button type="button" onClick={handleRemoveImage}>
-                Supprimer l’image
+              <img src={previewUrl} alt="Aperçu de la photo sélectionnée" />
+              <button type="button" className="btn btn-secondary btn-sm" onClick={handleRemoveImage}>
+                Retirer la photo
               </button>
             </div>
           )}
 
-          <div className="button-row">
-            <button type="submit">Publier</button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="cancel-button"
-            >
-              Annuler
-            </button>
-          </div>
-
           {message && (
-            <p className={`message ${statusType === 'success' ? 'success' : 'error'}`}>
-              {message}
+            <p
+              id="post-message"
+              className={`alert ${statusType === 'error' ? 'alert-error' : 'alert-success'}`}
+              role={statusType === 'error' ? 'alert' : 'status'}
+            >
+              {message} {statusType === 'success' && <Link to="/">Voir le fil d'actualité</Link>}
             </p>
           )}
+
+          <div className="form-actions">
+            <button type="button" onClick={handleCancel} className="btn btn-secondary">Annuler</button>
+            <button type="submit" className="btn btn-primary">Publier</button>
+          </div>
         </form>
-      </div>
+      </main>
     </>
   );
 }
-
