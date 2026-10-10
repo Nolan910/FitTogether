@@ -21,8 +21,8 @@ const renderApp = (path) => render(
 
 const fillAndSubmit = async (email, password) => {
   const user = userEvent.setup();
-  await user.type(screen.getByPlaceholderText('Email'), email);
-  await user.type(screen.getByPlaceholderText('Mot de passe'), password);
+  await user.type(screen.getByLabelText('Email'), email);
+  await user.type(screen.getByLabelText('Mot de passe'), password);
   await user.click(screen.getByRole('button', { name: 'Se connecter' }));
 };
 
@@ -49,7 +49,9 @@ describe('Formulaire de connexion', () => {
 
     await fillAndSubmit('alice@test.fr', 'mauvais1');
 
-    expect(await screen.findByText('Email ou mot de passe incorrect.')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Email ou mot de passe incorrect.');
+    expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Email')).toHaveAccessibleDescription('Email ou mot de passe incorrect.');
     expect(localStorage.getItem('token')).toBeNull();
   });
 });

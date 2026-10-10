@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
+import usePageTitle from '../hooks/usePageTitle';
 import { api } from '../api';
-import '../styles/Login.css';
+import '../styles/Auth.css';
 
 export default function Login() {
+  usePageTitle('Connexion');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const redirectedFrom = location.state?.from?.pathname;
 
   // Envoi du formulaire de connexion
   const handleSubmit = async (e) => {
@@ -24,7 +27,7 @@ export default function Login() {
       });
 
       login(data.token, data.user);
-      navigate(location.state?.from?.pathname || '/', { replace: true });
+      navigate(redirectedFrom || '/', { replace: true });
     } catch (err) {
       setMessage(err.message);
     }
@@ -33,35 +36,60 @@ export default function Login() {
   return (
     <>
       <Header />
-      <div className="login-container">
-        <form onSubmit={handleSubmit} className="login-form">
-          <h2>Connexion</h2>
+      <main id="contenu" tabIndex={-1} className="page auth-page">
+        <div className="card auth-card">
+          <h1>Connexion</h1>
+          <p className="page-subtitle">Retrouvez vos partenaires et vos séances.</p>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          {location.state?.registered && (
+            <p className="alert alert-success" role="status">Votre compte a été créé. Vous pouvez vous connecter.</p>
+          )}
+          {redirectedFrom && !location.state?.registered && (
+            <p className="alert alert-info" role="status">Connectez-vous pour accéder à cette page.</p>
+          )}
 
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <form onSubmit={handleSubmit} className="form-stack">
+            <div className="field">
+              <label htmlFor="login-email">Email</label>
+              <input
+                id="login-email"
+                className="input"
+                type="email"
+                autoComplete="email"
+                placeholder="nom@exemple.fr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={message ? 'true' : undefined}
+                aria-describedby={message ? 'login-error' : undefined}
+                required
+              />
+            </div>
 
-          <button type="submit">Se connecter</button>
+            <div className="field">
+              <label htmlFor="login-password">Mot de passe</label>
+              <input
+                id="login-password"
+                className="input"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                aria-invalid={message ? 'true' : undefined}
+                aria-describedby={message ? 'login-error' : undefined}
+                required
+              />
+            </div>
 
-          {message && <p className="message">{message}</p>}
+            {message && <p id="login-error" className="alert alert-error" role="alert">{message}</p>}
 
-          <p className="signup-link">
-            <Link to="/inscription">S'inscrire</Link>
+            <button type="submit" className="btn btn-primary btn-block">Se connecter</button>
+          </form>
+
+          <p className="auth-switch">
+            Pas encore de compte ? <Link to="/inscription">Créer un compte</Link>
           </p>
-        </form>
-      </div>
+        </div>
+      </main>
     </>
   );
 }
