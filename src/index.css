@@ -151,6 +151,10 @@ textarea {
   margin-bottom: 1.5rem;
 }
 
+.home-alert {
+  margin-bottom: 1.25rem;
+}
+
 .page-subtitle {
   margin-top: 0.25rem;
   color: var(--color-text-muted);

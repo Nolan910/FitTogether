@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import CreatePostButton from '../components/CreatePostButton';
 import HomePosts from '../components/HomePosts';
@@ -5,6 +7,15 @@ import usePageTitle from '../hooks/usePageTitle';
 
 export default function Home() {
   usePageTitle("Fil d'actualité");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [justPublished] = useState(() => Boolean(location.state?.published));
+
+  useEffect(() => {
+    if (location.state?.published) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location, navigate]);
 
   return (
     <>
@@ -17,6 +28,9 @@ export default function Home() {
           </div>
           <CreatePostButton />
         </div>
+        {justPublished && (
+          <p className="alert alert-success home-alert" role="status">Votre post a été publié.</p>
+        )}
         <HomePosts />
       </main>
     </>

@@ -1,6 +1,6 @@
 import '../styles/CreatePost.css';
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import usePageTitle from '../hooks/usePageTitle';
 import { api } from '../api';
@@ -13,6 +13,7 @@ export default function CreatePost() {
   const [statusType, setStatusType] = useState('');
   const [message, setMessage] = useState('');
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -64,11 +65,7 @@ export default function CreatePost() {
 
     try {
       await api('/createPoste', { method: 'POST', body: formData });
-
-      setStatusType('success');
-      setMessage('Post publié.');
-      setDescription('');
-      handleRemoveImage();
+      navigate('/', { state: { published: true } });
     } catch (err) {
       setStatusType('error');
       setMessage(err.message);
@@ -134,7 +131,7 @@ export default function CreatePost() {
               className={`alert ${statusType === 'error' ? 'alert-error' : 'alert-success'}`}
               role={statusType === 'error' ? 'alert' : 'status'}
             >
-              {message} {statusType === 'success' && <Link to="/">Voir le fil d'actualité</Link>}
+              {message}
             </p>
           )}
 
